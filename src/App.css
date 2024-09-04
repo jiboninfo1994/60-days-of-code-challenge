@@ -1,9 +1,13 @@
 .App {
-  /* text-align: center; */
+  text-align: center;
 }
 .bio-data {
   border-bottom: 1px solid #ddd;
   margin-bottom: 20px;
+}
+
+.disabled {
+  pointer-events: none;
 }
 
 .App-logo {
