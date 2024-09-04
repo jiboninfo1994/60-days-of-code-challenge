@@ -1,8 +1,4 @@
-1. Component wise interface create করার উদ্দেশ্যে react use করা হয় ।
-2. Website এ যেগুলো pattern match করে সেগুলো কে অবশ্যই একটা component বানাতে হবে ।
-3. কোন particular ui তে যদি pattern match না করে এবং সেখানে যদি অনেক complex logic handle করতে হয় সেটিকেও component বানাতে হবে ।
-4. npx create-react-app app-name এই command দিয়ে খুব react install করতে হয় ।
-5. ১ টা component fullfil হতে গেলে তাকে ৩ টা শর্ত মানতে হয়
-   ১। A component must be a function
-   ২। That function should be return 'something'
-   ৩। That something should be some html-eash code
+1. User এর Interactive এর ফলে ui তে আমরা যদি কোন change দেখাতে চাই তাহলে আমাদেরকে state এর মাধ্যমে Data change করতে হবে।
+2. useState hook use করার ফলে আমরা একটা array touple return পাই। একটা হল তার initial value or variable ও আর একটা হল ওই variable এর মান change করার জন্য একটা set funciton
+3. আমরা direct state এর মান change করতে পারব না । যখন আমাদের state এর মান change করতে হবে তখন set function call করার মাধ্যমে value change করতে হবে ।
+4. একমাত্র state এর মান change হলেই component render হয় এবং তার replaction ui তে দেখতে পাই।
