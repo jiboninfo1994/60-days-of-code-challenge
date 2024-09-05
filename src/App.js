@@ -9,6 +9,7 @@ function App() {
   const [count, setCount] = useState(0);
   const [users, setUsers] = useState([]);
   const [isWinner, setIsWinner] = useState(false);
+  const [maxAttempt, setMaxAttempt] = useState(3);
 
   const handleLuckyNumber = (e) => {
     const inputVal = e.target.value;
@@ -88,7 +89,7 @@ function App() {
             onChange={handleLuckyNumber}
           />
         </div>
-        {!isWinner && count >= 0 && count < 10 ? (
+        {!isWinner && count >= 0 && count < maxAttempt ? (
           <button className="submit-button">Try Your Luck</button>
         ) : null}
       </form>
