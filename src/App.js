@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import './App.css';
+import SuccErrMessage from './components/SuccErrMessage';
+import InputForm from './components/inputForm';
+import UserTable from './components/UserTable';
 
 function App() {
   const [tryNumber, setTryNumber] = useState('');
@@ -58,66 +61,23 @@ function App() {
 
   return (
     <div className="App" style={{ marginTop: '40px' }}>
-      {isLuckyMode &&
-        (tryNumber === randomNumber?.toString() ? (
-          <h2>
-            Congratulations, you won! your random number is {randomNumber}
-          </h2>
-        ) : (
-          <h2>
-            Uff! You lose, try again! your random number is {randomNumber}
-          </h2>
-        ))}
+      <SuccErrMessage
+        isLuckyMode={isLuckyMode}
+        tryNumber={tryNumber}
+        randomNumber={randomNumber}
+      />
+      <InputForm
+        handleSubmit={handleSubmit}
+        userName={userName}
+        setUserName={setUserName}
+        tryNumber={tryNumber}
+        handleLuckyNumber={handleLuckyNumber}
+        isWinner={isWinner}
+        count={count}
+        maxAttempt={maxAttempt}
+      />
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-group" style={{ marginBottom: '20px' }}>
-          <input
-            type="text"
-            placeholder="Type Your name... "
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-          />
-        </div>
-        <div className="form-group" style={{ marginBottom: '20px' }}>
-          <input
-            type="number"
-            value={tryNumber}
-            placeholder="Your guess number..."
-            min="0"
-            max="9"
-            style={{ minWidth: '50px', textAlign: 'center' }}
-            onChange={handleLuckyNumber}
-          />
-        </div>
-        {!isWinner && count >= 0 && count < maxAttempt ? (
-          <button className="submit-button">Try Your Luck</button>
-        ) : null}
-      </form>
-
-      {users && users.length > 0 && (
-        <div className="user-table" style={{ textAlign: 'center' }}>
-          <h2>User Table</h2>
-
-          <table style={{ minWidth: '500px', margin: 'auto' }}>
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Position</th>
-                <th scope="col">Total Attempts</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.title}</td>
-                  <td>{winnerPosition(index + 1)}</td>
-                  <td>You tried {item.totalAttempt + 1} times</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <UserTable users={users} winnerPosition={winnerPosition} />
     </div>
   );
 }
