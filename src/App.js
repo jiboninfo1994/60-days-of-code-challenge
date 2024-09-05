@@ -2,91 +2,121 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [noteTitle, setNoteTitle] = useState('');
-  const [notes, setNotes] = useState([]);
-  const [editMode, setEditMode] = useState(false);
-  const [editableNote, setEditableNote] = useState(null);
+  const [tryNumber, setTryNumber] = useState('');
+  const [userName, setUserName] = useState('');
+  const [randomNumber, setRandomNumber] = useState(null);
+  const [isLuckyMode, setIsLuckyMode] = useState(false);
+  const [count, setCount] = useState(0);
+  const [users, setUsers] = useState([]);
+  const [isWinner, setIsWinner] = useState(false);
 
-  // Submit handler
-  const submitHandler = (e) => {
-    e.preventDefault();
+  const handleLuckyNumber = (e) => {
+    const inputVal = e.target.value;
 
-    if (!noteTitle) {
-      return alert('Note title field is required!');
+    if (inputVal === '' || (inputVal >= 0 && inputVal <= 9)) {
+      setTryNumber(inputVal);
+    } else {
+      alert('Your number must be 0-9');
     }
-    editMode ? updateHandler() : createHandler();
   };
 
-  // Create handler
-  const createHandler = () => {
-    const newNote = {
-      id: Date.now().toString(),
-      title: noteTitle
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (tryNumber === '' || !userName) {
+      return alert('Number and Name field is required!');
+    }
 
-    setNotes([...notes, newNote]);
-    setNoteTitle('');
+    const randomNum = Math.floor(Math.random() * 10);
+
+    setRandomNumber(randomNum);
+    setIsLuckyMode(true);
+    setCount(count + 1);
+
+    updateUser(randomNum);
   };
 
-  // Delete handler
-  const deleteHandler = (id) => {
-    setNotes(notes?.filter((item) => item.id !== id));
+  const winnerPosition = (number) => {
+    if (number === 1) return number + 'st';
+    if (number === 2) return number + 'nd';
+    if (number === 3) return number + 'rd';
+    return number + 'th';
   };
 
-  // Edit handler
-  const editHandler = (note) => {
-    setEditMode(true);
-    setEditableNote(note);
-    setNoteTitle(note.title);
-  };
+  const updateUser = (randomNum) => {
+    if (parseInt(tryNumber) === randomNum) {
+      const newUser = {
+        id: Date.now().toString(),
+        title: userName,
+        totalAttempt: count
+      };
 
-  // Update Handler
-  const updateHandler = () => {
-    console.log('I am update');
-    setNotes(
-      notes.map((item) => {
-        if (item.id === editableNote.id) {
-          return { ...item, title: noteTitle };
-        }
-
-        return item;
-      })
-    );
-    setEditMode(false);
-    setEditableNote(null);
-    setNoteTitle('');
+      setIsWinner(true);
+      setUsers([...users, newUser]);
+    }
   };
 
   return (
     <div className="App" style={{ marginTop: '40px' }}>
-      <form onSubmit={submitHandler}>
-        <input
-          type="text"
-          placeholder="Note title..."
-          value={noteTitle}
-          onChange={(e) => setNoteTitle(e.target.value)}
-        />
-        <button type="submit">{editMode ? 'Update Note' : 'Add Note'}</button>
+      {isLuckyMode &&
+        (tryNumber === randomNumber?.toString() ? (
+          <h2>
+            Congratulations, you won! your random number is {randomNumber}
+          </h2>
+        ) : (
+          <h2>
+            Uff! You lose, try again! your random number is {randomNumber}
+          </h2>
+        ))}
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+          <input
+            type="text"
+            placeholder="Type Your name... "
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </div>
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+          <input
+            type="number"
+            value={tryNumber}
+            placeholder="Your guess number..."
+            min="0"
+            max="9"
+            style={{ minWidth: '50px', textAlign: 'center' }}
+            onChange={handleLuckyNumber}
+          />
+        </div>
+        {!isWinner && count >= 0 && count < 10 ? (
+          <button className="submit-button">Try Your Luck</button>
+        ) : null}
       </form>
-      <div className="note-list">
-        <h2>Note List</h2>
-        {notes && notes.length < 1 && <p>You don't have any Note!</p>}
-        {notes && notes.length > 0 && (
-          <ul>
-            {notes?.map((note) => (
-              <li key={note.id}>
-                <span>{note.title}</span>
-                <button type="button" onClick={() => editHandler(note)}>
-                  Edit Note
-                </button>
-                <button type="button" onClick={() => deleteHandler(note.id)}>
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+
+      {users && users.length > 0 && (
+        <div className="user-table" style={{ textAlign: 'center' }}>
+          <h2>User Table</h2>
+
+          <table style={{ minWidth: '500px', margin: 'auto' }}>
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Position</th>
+                <th scope="col">Total Attempts</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.title}</td>
+                  <td>{winnerPosition(index + 1)}</td>
+                  <td>You tried {item.totalAttempt + 1} times</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
