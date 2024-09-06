@@ -22,9 +22,21 @@ const inputForm = (props) => {
           onChange={props.handleLuckyNumber}
         />
       </div>
-      {!props.isWinner && props.count >= 0 && props.count < props.maxAttempt ? (
+      <p>
+        Your attempt {props.count} / {props.maxAttempt}
+      </p>
+      {/* {!props.isWinner && props.count >= 0 && props.count < props.maxAttempt ? (
         <button className="submit-button">Try Your Luck</button>
-      ) : null}
+      ) : null} */}
+      {!props.isSubmitted && props.count < props.maxAttempt && (
+        <button
+          type="submit"
+          className="submit-button"
+          onClick={props.handleSubmit}
+        >
+          Try Your Luck
+        </button>
+      )}
     </form>
   );
 };
