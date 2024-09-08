@@ -1,122 +1,139 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import './App.css';
-import SuccErrMessage from './components/SuccErrMessage';
-import InputForm from './components/inputForm';
-import UserTable from './components/UserTable';
+import StudentForm from './components/StudentForm';
+import StudentSection from './components/StudentSection';
 
 function App() {
-  const [tryNumber, setTryNumber] = useState('');
-  const [userName, setUserName] = useState('');
-  const [randomNumber, setRandomNumber] = useState(null);
-  const [isLuckyMode, setIsLuckyMode] = useState(false);
-  const [count, setCount] = useState(0);
-  const [users, setUsers] = useState([]);
-  const [isWinner, setIsWinner] = useState(false);
-  const [maxAttempt, setMaxAttempt] = useState(3);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  // All state
+  const [studentName, setStudentName] = useState('');
+  const [students, setStudents] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editableStudent, setEditableStudent] = useState(null);
+  const [studentErrMessage, setStudentErrMessage] = useState('');
 
-  const handleLuckyNumber = (e) => {
-    const inputVal = e.target.value;
+  // Student error message cleaTimeoutId
+  const cleaTimeoutId = useRef(null);
 
-    if (inputVal === '' || (inputVal >= 0 && inputVal <= 9)) {
-      setTryNumber(inputVal);
-    } else {
-      alert('Your number must be 0-9');
-    }
-  };
-
+  // Handle submit function
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (tryNumber === '' || !userName) {
-      return alert('Number and Name field is required!');
+
+    if (studentName.trim() === '') {
+      return alert('Student name is required!');
     }
 
-    const randomNum = Math.floor(Math.random() * 10);
-
-    setRandomNumber(randomNum);
-    setIsLuckyMode(true);
-    setCount(count + 1);
-    setIsSubmitted(false);
-
-    updateUser(randomNum);
+    editMode ? updateHandler() : createHandler();
   };
 
-  const winnerPosition = (user) => {
-    const winners = users.filter((item) => item.isWinner);
-    const winnerIndex = winners.findIndex((item) => item.id === user.id);
+  // Edit handler
+  const editHandler = (student) => {
+    setEditMode(true);
+    setStudentName(student.title);
+    setEditableStudent(student);
+  };
 
-    if (user.isWinner && winnerIndex !== -1) {
-      const position = winnerIndex + 1;
-      if (position === 1) return '1st';
-      if (position === 2) return '2nd';
-      if (position === 3) return '3rd';
-      return `${position + 1}th`;
+  // Create handler
+  const createHandler = () => {
+    const newStudent = {
+      id: Date.now() + '',
+      title: studentName,
+      isPresent: undefined
+    };
+
+    setStudents([newStudent, ...students]);
+    setStudentName('');
+  };
+
+  // Update handler
+  const updateHandler = () => {
+    setStudents(
+      students?.map((item) => {
+        if (item.id === editableStudent.id) {
+          return { ...item, title: studentName };
+        }
+
+        return item;
+      })
+    );
+
+    setStudentName('');
+    setEditMode(false);
+    setEditableStudent(null);
+  };
+
+  // Delete handler
+  const deleteHandler = (id) => {
+    setStudents(students?.filter((item) => item.id !== id));
+  };
+
+  // Student status handler
+  const studentStatusHandler = (student, action) => {
+    if (student.isPresent !== undefined && action !== 'toggle') {
+      studentError(student.isPresent);
+      return;
     }
-    return 'N/A';
+
+    setStudents(
+      students?.map((item) => {
+        if (item.id === student.id) {
+          if (action === 'present') {
+            return { ...item, isPresent: true };
+          } else if (action === 'absent') {
+            return { ...item, isPresent: false };
+          } else if (action === 'toggle') {
+            return { ...item, isPresent: !item.isPresent };
+          }
+        }
+
+        return item;
+      })
+    );
   };
 
-  const updateUser = (randomNum) => {
-    const newCount = count + 1;
-    if (parseInt(tryNumber) === randomNum) {
-      const newUser = {
-        id: Date.now().toString(),
-        title: userName,
-        totalAttempt: newCount,
-        isWinner: true
-      };
-      setIsWinner(true);
-      setUsers([newUser, ...users]);
-      setIsSubmitted(true);
-      resetForm();
-    } else if (newCount === maxAttempt) {
-      // User has reached max attempts without guessing correctly
-      const newUser = {
-        id: Date.now().toString(),
-        title: userName,
-        totalAttempt: newCount,
-        isWinner: false // Mark as not a winner
-      };
+  // Derived state
+  const presentStudent = students?.filter((item) => item.isPresent === true);
+  const absentStudent = students?.filter((item) => item.isPresent === false);
 
-      setIsWinner(false);
-      setUsers([newUser, ...users]);
-      setIsSubmitted(true);
-      resetForm();
+  // Student Error
+
+  const studentError = (status) => {
+    if (cleaTimeoutId.current) {
+      clearTimeout(cleaTimeoutId.current);
     }
+    if (status) {
+      setStudentErrMessage('This student is already in the Present List');
+    } else {
+      setStudentErrMessage('This student is already in the Absent List');
+    }
+
+    // Student error will be hide after 3000 ms
+    cleaTimeoutId.current = setTimeout(() => {
+      setStudentErrMessage('');
+    }, 3000);
   };
 
-  const resetForm = () => {
-    // setTryNumber('');
-    setUserName('');
-    // setIsLuckyMode(false);
-    setCount(0);
-    // setRandomNumber(null);
-  };
-
-  console.log('issubmitted', isSubmitted);
+  console.log('Jibon koi?');
 
   return (
     <div className="App" style={{ marginTop: '40px' }}>
-      <SuccErrMessage
-        isLuckyMode={isLuckyMode}
-        tryNumber={tryNumber}
-        randomNumber={randomNumber}
-        isSubmitted={isSubmitted}
-      />
-      <InputForm
+      <StudentForm
         handleSubmit={handleSubmit}
-        userName={userName}
-        setUserName={setUserName}
-        tryNumber={tryNumber}
-        handleLuckyNumber={handleLuckyNumber}
-        isWinner={isWinner}
-        count={count}
-        maxAttempt={maxAttempt}
+        studentName={studentName}
+        setStudentName={setStudentName}
+        editMode={editMode}
       />
-
-      <UserTable
-        users={users}
-        winnerPosition={winnerPosition}
-        isWinner={isWinner}
+      {studentErrMessage && (
+        <div className="student-err-message">
+          <p>{studentErrMessage}</p>
+        </div>
+      )}
+      <StudentSection
+        students={students}
+        presentStudent={presentStudent}
+        studentStatusHandler={studentStatusHandler}
+        absentStudent={absentStudent}
+        editHandler={editHandler}
+        deleteHandler={deleteHandler}
       />
     </div>
   );
