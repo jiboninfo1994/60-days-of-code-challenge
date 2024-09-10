@@ -1,33 +1,33 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { studentCTX } from '../contexts/StudentContext';
 
-const AllStudentList = (props) => {
+const AllStudentList = () => {
+  const { students, editHandler, deleteHandler, studentStatusHandler } =
+    useContext(studentCTX);
   return (
     <>
-      {props.students && props.students.length > 0 && (
+      {students && students.length > 0 && (
         <div className="all-student-list list">
           <h2 style={{ marginBottom: '20px' }}>All Student List</h2>
           <ul>
-            {props.students?.map((item) => (
+            {students?.map((item) => (
               <li key={item.id}>
                 <span>{item.title}</span>
-                <button type="button" onClick={() => props.editHandler(item)}>
+                <button type="button" onClick={() => editHandler(item)}>
                   Edit
                 </button>
-                <button
-                  type="button"
-                  onClick={() => props.deleteHandler(item.id)}
-                >
+                <button type="button" onClick={() => deleteHandler(item.id)}>
                   Delete
                 </button>
                 <button
                   type="button"
-                  onClick={() => props.studentStatusHandler(item, 'present')}
+                  onClick={() => studentStatusHandler(item, 'present')}
                 >
                   Add Present List
                 </button>
                 <button
                   type="button"
-                  onClick={() => props.studentStatusHandler(item, 'absent')}
+                  onClick={() => studentStatusHandler(item, 'absent')}
                 >
                   Add Absent List
                 </button>
