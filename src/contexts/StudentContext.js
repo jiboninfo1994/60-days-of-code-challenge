@@ -1,134 +1,143 @@
-import { createContext, useRef, useState } from 'react';
+import { createContext, useReducer, useEffect } from 'react';
 
 export const studentCTX = createContext();
 
-const StudentContext = ({ children }) => {
-  // All state
-  const [studentName, setStudentName] = useState('');
-  const [students, setStudents] = useState([]);
-  const [editMode, setEditMode] = useState(false);
-  const [editableStudent, setEditableStudent] = useState(null);
-  const [studentErrMessage, setStudentErrMessage] = useState('');
+const initialState = {
+  studentName: '',
+  students: [],
+  editMode: false,
+  editableStudent: null,
+  studentErrMessage: ''
+};
 
-  // Student error message cleaTimeoutId
-  const cleaTimeoutId = useRef(null);
-
-  // Handle submit function
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (studentName.trim() === '') {
-      return alert('Student name is required!');
-    }
-
-    editMode ? updateHandler() : createHandler();
-  };
-
-  // Edit handler
-  const editHandler = (student) => {
-    setEditMode(true);
-    setStudentName(student.title);
-    setEditableStudent(student);
-  };
-
-  // Create handler
-  const createHandler = () => {
+const reducer = (state, action) => {
+  if (action.type === 'CHANGE_STUDENT_NAME') {
+    return {
+      ...state,
+      studentName: action.payload
+    };
+  } else if (action.type === 'CREATE_STUDENT') {
     const newStudent = {
       id: Date.now() + '',
-      title: studentName,
+      title: state.studentName,
       isPresent: undefined
     };
-
-    setStudents([newStudent, ...students]);
-    setStudentName('');
-  };
-
-  // Update handler
-  const updateHandler = () => {
-    setStudents(
-      students?.map((item) => {
-        if (item.id === editableStudent.id) {
-          return { ...item, title: studentName };
+    return {
+      ...state,
+      students: [...state.students, newStudent],
+      studentName: ''
+    };
+  } else if (action.type === 'EDIT_STUDENT') {
+    return {
+      ...state,
+      editMode: true,
+      editableStudent: action.payload,
+      studentName: action.payload.title
+    };
+  } else if (action.type === 'UPDATE_STUDENT') {
+    return {
+      ...state,
+      students: state.students.map((item) => {
+        if (item.id === state.editableStudent.id) {
+          return {
+            ...item,
+            title: state.studentName
+          };
         }
 
         return item;
-      })
-    );
+      }),
+      editMode: false,
+      editableStudent: null,
+      studentName: ''
+    };
+  } else if (action.type === 'DELETE_STUDENT') {
+    console.log(action.payload.id);
 
-    setStudentName('');
-    setEditMode(false);
-    setEditableStudent(null);
-  };
-
-  // Delete handler
-  const deleteHandler = (id) => {
-    setStudents(students?.filter((item) => item.id !== id));
-  };
-
-  // Student status handler
-  const studentStatusHandler = (student, action) => {
-    if (student.isPresent !== undefined && action !== 'toggle') {
-      studentError(student.isPresent);
-      return;
+    return {
+      ...state,
+      students: state.students.filter((item) => item.id !== action.payload.id)
+    };
+  } else if (action.type === 'STUDENT_STATUS') {
+    if (
+      action.payload.data.isPresent !== undefined &&
+      action.payload.status !== 'toggle'
+    ) {
+      const errMessage = action.payload.data.isPresent
+        ? 'This student alreay in the Present list'
+        : 'This student alreay in the Absent list';
+      return {
+        ...state,
+        studentErrMessage: errMessage
+      };
     }
 
-    setStudents(
-      students?.map((item) => {
-        if (item.id === student.id) {
-          if (action === 'present') {
+    return {
+      ...state,
+      students: state.students.map((item) => {
+        if (item.id === action.payload.data.id) {
+          if (action.payload.status === 'present') {
+            console.log('I am inner');
+
             return { ...item, isPresent: true };
-          } else if (action === 'absent') {
+          } else if (action.payload.status === 'absent') {
             return { ...item, isPresent: false };
-          } else if (action === 'toggle') {
+          } else if (action.payload.status === 'toggle') {
             return { ...item, isPresent: !item.isPresent };
           }
         }
 
         return item;
       })
-    );
+    };
+  } else if (action.type === 'CLEAR_ERROR') {
+    return {
+      ...state,
+      studentErrMessage: ''
+    };
+  }
+};
+
+const StudentContext = ({ children }) => {
+  const [studentStates, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    if (studentStates.studentErrMessage) {
+      const timer = setTimeout(() => {
+        dispatch({ type: 'CLEAR_ERROR' });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [studentStates.studentErrMessage]);
+
+  // Handle submit function
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (studentStates.studentName.trim() === '') {
+      return alert('Student name is required!');
+    }
+
+    studentStates.editMode
+      ? dispatch({ type: 'UPDATE_STUDENT' })
+      : dispatch({ type: 'CREATE_STUDENT' });
   };
 
   // Derived state
-  const presentStudent = students?.filter((item) => item.isPresent === true);
-  const absentStudent = students?.filter((item) => item.isPresent === false);
-
-  // Student Error
-
-  const studentError = (status) => {
-    if (cleaTimeoutId.current) {
-      clearTimeout(cleaTimeoutId.current);
-    }
-    if (status) {
-      setStudentErrMessage('This student is already in the Present List');
-    } else {
-      setStudentErrMessage('This student is already in the Absent List');
-    }
-
-    // Student error will be hide after 3000 ms
-    cleaTimeoutId.current = setTimeout(() => {
-      setStudentErrMessage('');
-    }, 3000);
-  };
+  const presentStudent = studentStates.students?.filter(
+    (item) => item.isPresent === true
+  );
+  const absentStudent = studentStates.students?.filter(
+    (item) => item.isPresent === false
+  );
 
   const contextValue = {
-    studentName,
-    setStudentName,
-    students,
-    setStudents,
-    editMode,
-    setEditMode,
-    editableStudent,
-    setEditableStudent,
-    studentErrMessage,
-    setStudentErrMessage,
     handleSubmit,
-    editHandler,
-    updateHandler,
-    deleteHandler,
-    studentStatusHandler,
     presentStudent,
-    absentStudent
+    absentStudent,
+    studentStates,
+    dispatch
   };
 
   return (

@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import { studentCTX } from '../contexts/StudentContext';
 
 const StudentStatusList = (props) => {
-  const { students, studentStatusHandler } = useContext(studentCTX);
+  const { studentStates, dispatch } = useContext(studentCTX);
   return (
     <>
-      {students && students.length > 0 && (
+      {studentStates.students && studentStates.students.length > 0 && (
         <div className="present-student-list list">
           <h2 style={{ marginBottom: '20px' }}>{props.heading}</h2>
           <ul>
@@ -14,7 +14,12 @@ const StudentStatusList = (props) => {
                 <span>{item.title}</span>
                 <button
                   type="button"
-                  onClick={() => studentStatusHandler(item, 'toggle')}
+                  onClick={() =>
+                    dispatch({
+                      type: 'STUDENT_STATUS',
+                      payload: { status: 'toggle', data: item }
+                    })
+                  }
                 >
                   Accediently Added
                 </button>

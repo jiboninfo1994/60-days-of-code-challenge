@@ -2,32 +2,54 @@ import React, { useContext } from 'react';
 import { studentCTX } from '../contexts/StudentContext';
 
 const AllStudentList = () => {
-  const { students, editHandler, deleteHandler, studentStatusHandler } =
-    useContext(studentCTX);
+  const { studentStates, dispatch } = useContext(studentCTX);
   return (
     <>
-      {students && students.length > 0 && (
+      {studentStates.students && studentStates.students.length > 0 && (
         <div className="all-student-list list">
           <h2 style={{ marginBottom: '20px' }}>All Student List</h2>
           <ul>
-            {students?.map((item) => (
+            {studentStates.students?.map((item) => (
               <li key={item.id}>
                 <span>{item.title}</span>
-                <button type="button" onClick={() => editHandler(item)}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    dispatch({ type: 'EDIT_STUDENT', payload: item })
+                  }
+                >
                   Edit
                 </button>
-                <button type="button" onClick={() => deleteHandler(item.id)}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    dispatch({
+                      type: 'DELETE_STUDENT',
+                      payload: { id: item.id }
+                    })
+                  }
+                >
                   Delete
                 </button>
                 <button
                   type="button"
-                  onClick={() => studentStatusHandler(item, 'present')}
+                  onClick={() =>
+                    dispatch({
+                      type: 'STUDENT_STATUS',
+                      payload: { status: 'present', data: item }
+                    })
+                  }
                 >
                   Add Present List
                 </button>
                 <button
                   type="button"
-                  onClick={() => studentStatusHandler(item, 'absent')}
+                  onClick={() =>
+                    dispatch({
+                      type: 'STUDENT_STATUS',
+                      payload: { status: 'absent', data: item }
+                    })
+                  }
                 >
                   Add Absent List
                 </button>

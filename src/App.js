@@ -5,13 +5,13 @@ import StudentSection from './components/StudentSection';
 import { studentCTX } from './contexts/StudentContext';
 
 function App() {
-  const { studentErrMessage } = useContext(studentCTX);
+  const { studentStates } = useContext(studentCTX);
   return (
     <div className="App" style={{ marginTop: '40px' }}>
       <StudentForm />
-      {studentErrMessage && (
+      {studentStates.studentErrMessage && (
         <div className="student-err-message">
-          <p>{studentErrMessage}</p>
+          <p>{studentStates.studentErrMessage}</p>
         </div>
       )}
       <StudentSection />
