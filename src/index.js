@@ -3,14 +3,16 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import StudentContext from './contexts/StudentContext';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import UserContext from './context/UserContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   //   <React.StrictMode>
-  <StudentContext>
+  <UserContext>
     <App />
-  </StudentContext>
+  </UserContext>
+
   //   </React.StrictMode>
 );
 

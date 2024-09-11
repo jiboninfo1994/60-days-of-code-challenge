@@ -1,20 +1,29 @@
-import { useContext } from 'react';
+import { Col, Container, Row } from 'react-bootstrap';
 import './App.css';
-import StudentForm from './components/StudentForm';
-import StudentSection from './components/StudentSection';
-import { studentCTX } from './contexts/StudentContext';
+import UserForm from './components/UserForm';
+import AllUserTable from './components/AllUserTable';
+import UserStatusTabele from './components/UserStatusTabele';
 
 function App() {
-  const { studentStates } = useContext(studentCTX);
   return (
-    <div className="App" style={{ marginTop: '40px' }}>
-      <StudentForm />
-      {studentStates.studentErrMessage && (
-        <div className="student-err-message">
-          <p>{studentStates.studentErrMessage}</p>
+    <div className="App pt-5">
+      <Container>
+        <Row className="justify-content-md-center">
+          <Col xs lg="5">
+            <UserForm />
+          </Col>
+        </Row>
+        <div className="student-table-wrap pt-4">
+          <Row>
+            <Col xs lg="7">
+              <AllUserTable />
+            </Col>
+            <Col xs lg="5">
+              <UserStatusTabele />
+            </Col>
+          </Row>
         </div>
-      )}
-      <StudentSection />
+      </Container>
     </div>
   );
 }
