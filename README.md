@@ -1,1 +1,1 @@
-1. উপরের video এর state change concept এর উপর depend করে note ticking app টা create করা হল।
+1. npm run fake-json-server এই command দিয়ে fake server run করতে হবে।
