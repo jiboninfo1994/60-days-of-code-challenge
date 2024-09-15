@@ -1,147 +1,83 @@
-import { Button, Col, Container, Form, ListGroup, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import './App.css';
+import StudentForm from './components/StudentForm';
+import AllStudent from './components/AllStudent';
 import { useEffect, useState } from 'react';
+import StudentStatusList from './components/StudentStatusList';
+import { useDispatch, useSelector } from 'react-redux';
+import { studentStatusHandle } from './app/features/Student';
 
 function App() {
-  const [noteTitle, setNotetitle] = useState('');
-  const [notes, setNotes] = useState([]);
   const [editMode, setEditMode] = useState(false);
-  const [editableNote, setEditableNote] = useState(null);
+  const [studentName, setStudentName] = useState('');
+  const [editableStudent, setEditableStudent] = useState(null);
+  const [presentStudentList, setPresentStudentList] = useState([]);
+  const [absentStudentList, setAbsentStudentList] = useState([]);
 
-  // Fetch Data
-  const fetchData = async () => {
-    const response = await fetch('http://localhost:4000/notes');
-    const data = await response.json();
-
-    setNotes(data);
-  };
+  const { students, prosentStudentList } = useSelector((state) => state);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    console.log(prosentStudentList);
+  }, [prosentStudentList]);
 
-  // Handle submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  //   console.log(presentStudentList);
+  useEffect(() => {
+    setPresentStudentList(students.filter((item) => item.isPresent === true));
+    setAbsentStudentList(students.filter((item) => item.isPresent === false));
+  }, [students]);
 
-    if (noteTitle.trim() === '') {
-      return alert('Note title field is required!');
+  const removeStudentHandler = (student) => {
+    if (student.isPresent) {
+      setPresentStudentList(
+        presentStudentList?.filter((item) => item.id !== student.id)
+      );
+    } else {
+      setAbsentStudentList(
+        absentStudentList?.filter((item) => item.id !== student.id)
+      );
     }
 
-    editMode ? updateHandler() : createHandler();
-  };
-
-  // Create handler
-  const createHandler = async () => {
-    const newNote = {
-      id: Date.now() + '',
-      title: noteTitle
-    };
-
-    const response = await fetch('http://localhost:4000/notes', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(newNote)
-    });
-    const data = response.json();
-
-    // setNotes([...notes, newNote]);
-    setNotes(data);
-    setNotetitle('');
-
-    await fetchData();
-  };
-
-  // Edit handler
-  const editHandler = (note) => {
-    setEditMode(true);
-    setNotetitle(note.title);
-    setEditableNote(note);
-  };
-
-  // Update handler
-  const updateHandler = async () => {
-    const { id, ...rest } = editableNote;
-    const updateNote = { ...rest, title: noteTitle };
-    const response = await fetch(
-      `http://localhost:4000/notes/${editableNote.id}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(updateNote)
-      }
-    );
-    const data = response.json();
-
-    setNotes(data);
-    setEditMode(false);
-    setNotetitle('');
-    setEditableNote(null);
-
-    await fetchData();
-  };
-
-  // Delete handler
-  const deleteHandler = async (id) => {
-    const response = await fetch(`http://localhost:4000/notes/${id}`, {
-      method: 'DELETE'
-    });
-    const data = await response.json();
-
-    setNotes(data);
-
-    await fetchData();
+    dispatch(studentStatusHandle({ student, status: 'remove' }));
   };
 
   return (
     <div className="App pt-5">
       <Container>
         <Row className="justify-content-md-center">
-          <Col xs lg="5">
-            <Form className="mb-5" onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Note Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter note title..."
-                  value={noteTitle}
-                  onChange={(e) => setNotetitle(e.target.value)}
-                />
-              </Form.Group>
-              <Button variant="primary" type="submit">
-                {editMode ? 'Update Note' : 'Add Note'}
-              </Button>
-            </Form>
-
-            {notes &&
-              notes.length > 0 &&
-              notes.map((item) => (
-                <ListGroup key={item.id}>
-                  <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                    <span>{item.title}</span>
-                    <div className="button-wrapper d-flex gap-3">
-                      <Button
-                        variant="secondary"
-                        type="button"
-                        onClick={() => editHandler(item)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => deleteHandler(item.id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </ListGroup.Item>
-                </ListGroup>
-              ))}
+          <Col xs lg="4">
+            <StudentForm
+              editMode={editMode}
+              studentName={studentName}
+              setStudentName={setStudentName}
+              editableStudent={editableStudent}
+              setEditableStudent={setEditableStudent}
+              setEditMode={setEditMode}
+            />
           </Col>
+          <Row className="pt-5">
+            <Col lg="4">
+              <AllStudent
+                setEditableStudent={setEditableStudent}
+                setEditMode={setEditMode}
+                setStudentName={setStudentName}
+              />
+            </Col>
+            <Col lg="4">
+              <StudentStatusList
+                heading="Present List"
+                statusList={presentStudentList}
+                removeStudentHandler={removeStudentHandler}
+              />
+            </Col>
+            <Col lg="4">
+              <StudentStatusList
+                heading="Absent List"
+                statusList={absentStudentList}
+                removeStudentHandler={removeStudentHandler}
+              />
+            </Col>
+          </Row>
         </Row>
       </Container>
     </div>
