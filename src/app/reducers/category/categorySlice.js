@@ -81,69 +81,61 @@ export const updateCategory = createAsyncThunk(
 const initialState = {
   isLoading: false,
   isError: null,
-  categories: [],
-  catName: '',
-  editMode: false,
-  editableCat: null
+  categories: []
 };
 
 export const categorySlice = createSlice({
   name: 'category',
   initialState,
-  reducers: {
-    changeTitle: (state, action) => {
-      state.catName = action.payload;
-    },
-    editCategory: (state, action) => {
-      state.catName = action.payload.name;
-      (state.editMode = true), (state.editableCat = action.payload);
-    }
-  },
   extraReducers: (builder) => {
     builder
       .addCase(getCategories.pending, (state) => {
-        (state.isLoading = true), (state.isError = null);
+        state.isLoading = true;
+        state.isError = null;
       })
       .addCase(getCategories.fulfilled, (state, action) => {
-        (state.isLoading = false), (state.categories = action.payload);
+        state.isLoading = false;
+        state.categories = action.payload;
       })
       .addCase(getCategories.rejected, (state, action) => {
-        (state.isLoading = false),
-          (state.isError = action.error?.message || 'Data fatching problem!');
+        state.isLoading = false;
+        state.isError = action.error?.message || 'Data fatching problem!';
       })
       .addCase(createCategory.pending, (state) => {
-        (state.isLoading = true), (state.isError = null);
+        state.isLoading = true;
+        state.isError = null;
       })
       .addCase(createCategory.fulfilled, (state, action) => {
-        (state.isLoading = false),
-          (state.categories = [...state.categories, action.payload]),
-          (state.catName = '');
+        state.isLoading = false;
+        state.categories = [...state.categories, action.payload];
       })
       .addCase(createCategory.rejected, (state, action) => {
-        (state.isLoading = false),
-          (state.isError = action.error?.message || 'Data fatching problem!');
+        state.isLoading = false;
+        state.isError = action.error?.message || 'Data fatching problem!';
       })
       .addCase(deleteCategory.pending, (state) => {
-        (state.isLoading = true), (state.isError = null);
+        state.isLoading = true;
+        state.isError = null;
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
-        (state.isLoading = false),
-          (state.categories = state.categories.filter(
-            (category) => category.id !== action.payload
-          ));
+        state.isLoading = false;
+        state.categories = state.categories.filter(
+          (category) => category.id !== action.payload
+        );
       })
       .addCase(deleteCategory.rejected, (state, action) => {
-        (state.isLoading = false),
-          (state.isError = action.error?.message || 'Data fatching problem!');
+        state.isLoading = false;
+        state.isError = action.error?.message || 'Data fatching problem!';
       })
       .addCase(updateCategory.pending, (state) => {
-        (state.isLoading = true), (state.isError = null);
+        state.isLoading = true;
+        state.isError = null;
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
         state.isLoading = false;
 
         state.categories = [...state.categories].map((item) => {
-          if (item.id === state.editableCat.id) {
+          if (item.id === action.payload.id) {
             return (item = action.payload);
           }
           return item;
@@ -154,13 +146,12 @@ export const categorySlice = createSlice({
         state.catName = '';
       })
       .addCase(updateCategory.rejected, (state, action) => {
-        (state.isLoading = false),
-          (state.isError = action.error?.message || 'Data fatching problem!');
+        state.isLoading = false;
+        state.isError = action.error?.message || 'Data fatching problem!';
       });
   }
 });
 
 export const categoryReducerState = (state) => state.categoryReducer;
-export const { changeTitle, editCategory } = categorySlice.actions;
 
 export default categorySlice.reducer;

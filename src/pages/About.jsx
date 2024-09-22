@@ -1,5 +1,11 @@
+import PostSection from '../components/PostSection';
+
 const About = () => {
-  return <div>This is about page</div>;
+  return (
+    <>
+      <PostSection />
+    </>
+  );
 };
 
 export default About;

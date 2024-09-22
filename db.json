@@ -11,6 +11,78 @@
     {
       "id": "1726663806579",
       "name": "Men"
+    },
+    {
+      "id": "1726832269617",
+      "name": "dfas"
+    },
+    {
+      "id": "1726833643268",
+      "name": "ssdf"
+    },
+    {
+      "id": "1726936014866",
+      "name": "dfa"
+    }
+  ],
+  "authors": [
+    {
+      "id": "1726763153027",
+      "name": "JIbon",
+      "category_id": "1726662455368"
+    },
+    {
+      "id": "1726931169377",
+      "name": "Sumon",
+      "category_id": "1726662455368"
+    },
+    {
+      "id": "1726936029682",
+      "name": "Shamim",
+      "category_id": "1726663806579"
+    },
+    {
+      "id": "1726942609025",
+      "name": "dsf",
+      "category_id": "1726832269617"
+    }
+  ],
+  "blogs": [
+    {
+      "id": "1726984336986",
+      "title": "Post Title 2",
+      "description": "dfaddfgasdf5544",
+      "author_id": "1726763153027",
+      "category_id": "1726655907568",
+      "likes": "522",
+      "dateTime": "22nd Sep, 2024 11:52 AM"
+    },
+    {
+      "id": "1726995063223",
+      "title": "Post title 3",
+      "description": "Post description 3",
+      "author_id": "1726936029682",
+      "category_id": "1726663806579",
+      "likes": "145",
+      "dateTime": "22nd Sep, 2024 2:51 PM"
+    },
+    {
+      "id": "1726997805847",
+      "title": "This is my first post title",
+      "description": "dfsaf",
+      "author_id": "1726936029682",
+      "category_id": "1726663806579",
+      "likes": "252",
+      "dateTime": "22nd Sep, 2024 3:36 PM"
+    },
+    {
+      "id": "1726997889439",
+      "title": "This is my first post title",
+      "description": "dfsaf",
+      "author_id": "1726936029682",
+      "category_id": "1726663806579",
+      "likes": "252",
+      "dateTime": "22nd Sep, 2024 3:38 PM"
     }
   ]
 }
