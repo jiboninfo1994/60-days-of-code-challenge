@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -29,30 +30,6 @@ export const handleApiError = (error, customErrorMessage) => {
 };
 
 export const formatDate = (getDate) => {
-  const date = new Date(getDate);
-  const day = date.getDate(),
-    month = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ][date.getMonth()];
-  const suffix =
-    day > 3 && day < 21
-      ? 'th'
-      : ['th', 'st', 'nd', 'rd'][day % 10 > 3 ? 0 : day % 10];
-  const hours = date.getHours() % 12 || 12,
-    ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-  return `${day}${suffix} ${month}, ${date.getFullYear()} ${hours}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')} ${ampm}`;
+  const formattedDate = moment(getDate).format('DD MMM YYYY hh:mm A');
+  return formattedDate;
 };

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { handleApiError } from '../../common/common';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 
 const URL = 'http://localhost:3000/blogs';
 
@@ -30,6 +31,7 @@ export const getPosts = createAsyncThunk(
       return response.json();
     } catch (error) {
       handleApiError(error, 'Post fatchin problem!');
+      rejectWithValue(error);
     }
   }
 );
@@ -114,17 +116,22 @@ export const deletePost = createAsyncThunk(
 // Update Post
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
-  async ({ editablePost, postValue }, thunkAPI) => {
+  async ({ editablePost, postValue, selectedTagsId }, thunkAPI) => {
     const { rejectWithValue, signal } = thunkAPI;
-    const { id, ...rest } = editablePost;
+    const { id, created_at, ...rest } = editablePost;
+    const timeStamp = moment.utc().toISOString();
     const updateNote = {
       ...rest,
       title: postValue.postTitle,
       description: postValue.postDescription,
       author_id: postValue.authorId,
       category_id: postValue.categoryId,
-      likes: postValue.likes
+      likes: postValue.likes,
+      tags: selectedTagsId,
+      updated_at: timeStamp
     };
+
+    console.log(selectedTagsId);
 
     try {
       const response = await fetch(
@@ -193,6 +200,11 @@ export const postsSlice = createSlice({
         state.isLoading = false;
         state.isError = null;
         state.posts = [action.payload, ...state.posts];
+        state.posts.sort((a, b) => {
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        });
       })
       .addCase(createPost.rejected, (state, action) => {
         state.isLoading = false;

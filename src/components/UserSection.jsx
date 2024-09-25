@@ -24,6 +24,15 @@ const UserSection = () => {
   const { categories } = useSelector(categoryReducerState);
   const dispatch = useDispatch();
 
+  // Handle change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInputValue((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
   // Handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,15 +48,13 @@ const UserSection = () => {
     };
 
     if (editMode) {
-      dispatch(updateUser(newUser));
+      dispatch(updateUser({ editableUser, inputValue }));
+      setEditMode(false);
+      setEditableUser(null);
+      setInputValue({ ...inputValue, userName: '', selectedCategory: '' });
     } else {
       dispatch(createUser(newUser));
-      const newObj = {
-        ...inputValue
-      };
-      newObj.userName = '';
-
-      setInputValue(newObj);
+      setInputValue({ ...inputValue, userName: '', selectedCategory: '' });
     }
   };
 
@@ -57,10 +64,11 @@ const UserSection = () => {
 
     setEditMode(true);
     setEditableUser(user);
-    setInputValue((prevState) => ({
-      ...prevState,
-      userName: user.name
-    }));
+    setInputValue({
+      ...inputValue,
+      userName: user.name,
+      selectedCategory: user.category_id
+    });
   };
 
   // Get Data
@@ -80,10 +88,10 @@ const UserSection = () => {
         <div className="flex mb-4 flex-wrap">
           <div className="w-1/2">
             <UserForm
-              userName={inputValue}
-              setInputValue={setInputValue}
+              inputValue={inputValue}
               onHandleSubmit={handleSubmit}
               editMode={editMode}
+              onHandleChange={handleChange}
             />
           </div>
           <div className="w-1/2">

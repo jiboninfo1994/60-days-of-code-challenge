@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux';
+import { formatDate } from '../app/common/common';
 
 const ListTable = ({
   isLoading,
@@ -9,8 +10,9 @@ const ListTable = ({
   catList,
   postDescription,
   likes,
-  dateTime,
-  userList
+  created_at,
+  userList,
+  updatedAt
 }) => {
   const dispatch = useDispatch();
   return (
@@ -29,7 +31,8 @@ const ListTable = ({
                 {userList && <th>User Name</th>}
                 {postDescription && <th>Description</th>}
                 {likes && <th>Total Likes</th>}
-                {dateTime && <th>Create AT</th>}
+                {created_at && <th>Create AT</th>}
+                {updatedAt && <th>Updated AT</th>}
 
                 <th>Actions</th>
               </tr>
@@ -60,7 +63,12 @@ const ListTable = ({
                     {/* <td>{category.name}</td> */}
                     {list?.description && <td>{list?.description}</td>}
                     {list?.likes && <td>{list?.likes}</td>}
-                    {list?.dateTime && <td>{list?.dateTime}</td>}
+                    {list?.created_at && (
+                      <td>{formatDate(list?.created_at)}</td>
+                    )}
+                    {list?.created_at && (
+                      <td>{formatDate(list?.updated_at)}</td>
+                    )}
 
                     <td>
                       <div className="action flex gap-4">

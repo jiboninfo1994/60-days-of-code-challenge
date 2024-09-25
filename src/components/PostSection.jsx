@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
+import moment from 'moment';
 import {
   categoryReducerState,
   getCategories
 } from '../app/reducers/category/categorySlice';
 import PostForm from './PostForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUsers, userReducerState } from '../app/reducers/users/usersSlice';
+import {
+  getUsers,
+  selectedAuthorsByCatId,
+  userReducerState
+} from '../app/reducers/users/usersSlice';
 import {
   createPost,
   deletePost,
@@ -13,8 +18,13 @@ import {
   postReducerState,
   updatePost
 } from '../app/reducers/posts/postsSlice';
-import { formatDate } from '../app/common/common';
 import ListTable from './ListTable';
+import {
+  crateTag,
+  getTags,
+  searchTagByTitle,
+  tagsReducerState
+} from '../app/reducers/tags/tagsSlice';
 
 const PostSection = () => {
   const [postValue, setPostValue] = useState({
@@ -22,21 +32,30 @@ const PostSection = () => {
     authorId: '',
     postTitle: '',
     postDescription: '',
-    likes: ''
+    inpuTagName: '',
+    likes: 0
   });
   const [editMode, setEditMode] = useState(false);
   const [editablePost, setEditablePost] = useState(null);
+  const [selectedTagsId, setSelectedTagsId] = useState([]);
+  const [typingTime, setTypingTime] = useState(null);
   const { isLoading, isError, categories } = useSelector(categoryReducerState);
   const {
     isLoading: userIsLoading,
     isError: userIsError,
-    users
+    users,
+    authorByCategories
   } = useSelector(userReducerState);
   const {
     isLoading: postIsLoading,
     isError: postIsError,
     posts
   } = useSelector(postReducerState);
+  const {
+    isLoading: tagIsLoading,
+    isError: tagIsError,
+    tags
+  } = useSelector(tagsReducerState);
 
   const dispatch = useDispatch();
 
@@ -44,16 +63,32 @@ const PostSection = () => {
     dispatch(getCategories());
     dispatch(getUsers());
     dispatch(getPosts());
+    dispatch(getTags());
   }, [dispatch]);
 
+  //
+  //   useEffect(() => {
+  //     if (postValue.inpuTagName) {
+  //       dispatch(selectedAuthorsByCatId(postValue.inpuTagName));
+  //     }
+  //   }, [dispatch, postValue.inpuTagName]);
+
   // Handle change
-  const handleChane = (e) => {
+  const handleChange = (e) => {
     let { name, value } = e.target;
 
     if (name === 'likes') {
       if (isNaN(value.trim())) {
         value = '';
       }
+    }
+
+    if (name === 'inpuTagName') {
+      dispatch(searchTagByTitle(value));
+    }
+
+    if (name === 'categoryId') {
+      dispatch(selectedAuthorsByCatId(value));
     }
 
     setPostValue((prevState) => ({
@@ -76,6 +111,8 @@ const PostSection = () => {
       return alert('All field are required');
     }
 
+    const timeStamp = moment.utc().toISOString();
+
     const newPost = {
       id: Date.now() + '',
       title: postValue.postTitle,
@@ -83,17 +120,21 @@ const PostSection = () => {
       author_id: postValue.authorId,
       category_id: postValue.categoryId,
       likes: postValue.likes,
-      dateTime: formatDate(Date.now())
+      tags: selectedTagsId,
+      created_at: timeStamp,
+      updated_at: timeStamp
     };
 
     if (editMode) {
-      dispatch(updatePost({ editablePost, postValue }));
+      dispatch(updatePost({ editablePost, postValue, selectedTagsId }));
       setEditMode(false);
       setEditablePost(null);
       resetForm();
+      setSelectedTagsId([]);
     } else {
       dispatch(createPost(newPost));
       resetForm();
+      setSelectedTagsId([]);
     }
   };
 
@@ -101,7 +142,7 @@ const PostSection = () => {
   const handleEdit = (post) => {
     setEditMode(true);
     setEditablePost(post);
-
+    setSelectedTagsId(post.tags);
     setPostValue({
       ...postValue,
       categoryId: post.category_id,
@@ -110,6 +151,8 @@ const PostSection = () => {
       postDescription: post.description,
       likes: post.likes
     });
+
+    dispatch(selectedAuthorsByCatId(post.category_id));
   };
 
   // Reset form
@@ -120,8 +163,105 @@ const PostSection = () => {
       authorId: '',
       postTitle: '',
       postDescription: '',
-      likes: ''
+      likes: 0
     });
+  };
+
+  // handle selectd tag
+  const handleSelectedTag = (tag) => {
+    const isTagAlreadySelected = selectedTagsId?.includes(tag.id);
+
+    if (!isTagAlreadySelected) {
+      setSelectedTagsId([...selectedTagsId, tag.id]);
+    }
+    setPostValue({ ...postValue, inpuTagName: '' });
+  };
+
+  const handleRemoveTag = (tagId) => {
+    const filterTag = selectedTagsId.filter((item) => item !== tagId);
+    // console.log('filter Tag', filterTag);
+
+    setSelectedTagsId(filterTag);
+  };
+
+  // Cansel update
+  const cancleUpdateHandler = () => {
+    resetForm();
+    setEditMode(false);
+    setEditablePost(null);
+    setSelectedTagsId([]);
+  };
+
+  // Handle tag input keydown
+  //   const handleTagInputKeyDown = (e) => {
+  //     if (e.key === 'Enter') {
+  //       e.preventDefault();
+
+  //       const tagName = postValue.inpuTagName?.trim().toLowerCase();
+  //       const existingTag = tags
+  //         ?.map((item) => item.name.toLowerCase())
+  //         .includes(tagName);
+
+  //       if (!existingTag) {
+  //         const timeStamp = moment.utc().toISOString();
+  //         const newTag = {
+  //           id: Date.now() + '',
+  //           name: tagName,
+  //           created_at: timeStamp,
+  //           updated_at: timeStamp
+  //         };
+
+  //         dispatch(crateTag(newTag));
+  //         setPostValue({ ...postValue, inpuTagName: '' });
+  //       }
+  //     }
+  const handleTagInputKeyDown = (e) => {
+    const tagName = postValue.inpuTagName?.trim().toLowerCase();
+    const existingTag = tags
+      ?.map((item) => item.name.toLowerCase())
+      .includes(tagName);
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+
+      if (!existingTag && tagName) {
+        createTagInLocal(tagName);
+      }
+      return;
+    }
+
+    if (typingTime) {
+      clearTimeout(typingTime);
+    }
+
+    const timeOutId = setTimeout(() => {
+      if (!existingTag && tagName) {
+        createTagInLocal(tagName);
+      }
+    }, 5000);
+
+    setTypingTime(timeOutId);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (typingTime) {
+        clearTimeout(typingTime);
+      }
+    };
+  }, [typingTime]);
+
+  const createTagInLocal = (tagName) => {
+    const timeStamp = moment.utc().toISOString();
+    const newTag = {
+      id: Date.now() + '',
+      name: tagName,
+      created_at: timeStamp,
+      updated_at: timeStamp
+    };
+
+    dispatch(crateTag(newTag));
+    setPostValue({ ...postValue, inpuTagName: '' });
   };
 
   return (
@@ -135,11 +275,17 @@ const PostSection = () => {
               isLoading={isLoading}
               userIsLoading={userIsLoading}
               userIsError={userIsError}
-              users={users}
+              users={authorByCategories}
               onHandleSubmit={handleSubmit}
               postValue={postValue}
-              onHandleChane={handleChane}
+              onHandleChane={handleChange}
               editMode={editMode}
+              tags={tags}
+              selectedTagsId={selectedTagsId}
+              onHandleSelectedTag={handleSelectedTag}
+              onHandleRemoveTag={handleRemoveTag}
+              onCancelUpdate={cancleUpdateHandler}
+              onHandleTagInputKeyDown={handleTagInputKeyDown}
             />
           </div>
           <div className="w-2/3">
@@ -148,8 +294,9 @@ const PostSection = () => {
               isError={postIsError}
               lists={posts}
               postDescription={'postDescription'}
-              likes={'likes'}
-              dateTime={'dateTime'}
+              likes={true}
+              created_at={true}
+              updatedAt={true}
               onDeleteHandler={deletePost}
               catList={categories}
               onEditHandler={handleEdit}
