@@ -10,6 +10,7 @@ import {
 } from '../../app/reducers/tags/tagsSlice';
 import moment from 'moment';
 import ListTable from '../ListTable';
+import PostSection from '../PostSection';
 
 const TagSection = () => {
   const [tagName, setTagName] = useState('');
@@ -64,25 +65,28 @@ const TagSection = () => {
     <section className="py-16">
       <div className="xl:container mx-auto">
         <div className="flex mb-4 flex-wrap">
-          <div className="w-1/3">
-            <TagForm
-              tagName={tagName}
-              setTagName={setTagName}
-              onHandleChange={handleChange}
-              onHandleSubmit={handleSubmit}
-              editMode={editMode}
-            />
+          <div className="w-1/3 px-7">
+            <PostSection />
           </div>
           <div className="w-2/3">
-            <ListTable
-              lists={tags}
-              isLoading={isLoading}
-              isError={isError}
-              created_at={true}
-              updatedAt={true}
-              onDeleteHandler={deleteTag}
-              onEditHandler={handleEdit}
-            />
+            <div className="flex flex-col gap-16">
+              <TagForm
+                tagName={tagName}
+                setTagName={setTagName}
+                onHandleChange={handleChange}
+                onHandleSubmit={handleSubmit}
+                editMode={editMode}
+              />
+              <ListTable
+                lists={tags}
+                isLoading={isLoading}
+                isError={isError}
+                created_at={true}
+                updatedAt={true}
+                onDeleteHandler={deleteTag}
+                onEditHandler={handleEdit}
+              />
+            </div>
           </div>
         </div>
       </div>

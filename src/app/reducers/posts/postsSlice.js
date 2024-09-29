@@ -3,16 +3,44 @@ import { handleApiError } from '../../common/common';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
-const URL = 'http://localhost:3000/blogs';
+// let Base_URL = 'http://localhost:3000/blogs?_page=1&_limit=8';
+let Base_URL = 'http://localhost:3000/blogs';
 
 // Get post
 export const getPosts = createAsyncThunk(
   'posts/getPosts',
-  async (_, thunkAPI) => {
+  async (filterValue, thunkAPI) => {
     const { rejectWithValue, signal } = thunkAPI;
+    let url = Base_URL;
+
+    console.log(filterValue);
+
+    if (filterValue) {
+      const { category, tag, author, search, postPerpage, currentPage } =
+        filterValue;
+      //   console.log('tag', tag);
+
+      let queryParams = [];
+
+      if (category) queryParams.push(`category_id=${category}`);
+      //   if (tag && tag.length > 0) queryParams.push(`tag_id=${[tag]}`);
+      if (tag) queryParams.push(`tags=${[tag]}`);
+      if (author) queryParams.push(`author_id=${author}`);
+      if (search) queryParams.push(`title=${search}`);
+
+      if (queryParams.length > 0) {
+        url += '?' + queryParams.join('&');
+      }
+
+      if (postPerpage && currentPage) {
+        url = `${url}?_page=${postPerpage}&_limit=${currentPage}`;
+      }
+    }
+
+    console.log(url);
 
     try {
-      const response = await fetch(URL, signal);
+      const response = await fetch(url, signal);
       if (!response.ok) {
         const error = {
           response: {
@@ -43,7 +71,7 @@ export const createPost = createAsyncThunk(
     const { rejectWithValue, signal } = thunkAPI;
     try {
       const response = await fetch(
-        URL,
+        Base_URL,
         {
           method: 'POST',
           headers: {
@@ -86,7 +114,7 @@ export const deletePost = createAsyncThunk(
 
     try {
       const response = await fetch(
-        `${URL}/${id}`,
+        `${Base_URL}/${id}`,
         {
           method: 'Delete'
         },
@@ -135,7 +163,7 @@ export const updatePost = createAsyncThunk(
 
     try {
       const response = await fetch(
-        `${URL}/${id}`,
+        `${Base_URL}/${id}`,
         {
           method: 'PATCH',
           headers: {

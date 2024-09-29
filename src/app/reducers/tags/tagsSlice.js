@@ -189,12 +189,16 @@ export const searchTagByTitle = createAsyncThunk(
 const initialState = {
   isLoading: false,
   isError: null,
-  tags: []
+  tags: [],
+  searchTags: []
 };
 
 export const tagsSlice = createSlice({
   name: 'tags',
   initialState,
+  reducers: (state) => {
+    state.searchTags = [];
+  },
   extraReducers: (builder) => {
     builder
       .addCase(crateTag.pending, (state, action) => {
@@ -275,5 +279,6 @@ export const tagsSlice = createSlice({
 });
 
 export const tagsReducerState = (state) => state.tagsReducer;
+export const { updateSearchTags } = tagsSlice.actions;
 
 export default tagsSlice.reducer;

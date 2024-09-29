@@ -25,6 +25,7 @@ import {
   searchTagByTitle,
   tagsReducerState
 } from '../app/reducers/tags/tagsSlice';
+import { useLocation } from 'react-router-dom';
 
 const PostSection = () => {
   const [postValue, setPostValue] = useState({
@@ -38,7 +39,6 @@ const PostSection = () => {
   const [editMode, setEditMode] = useState(false);
   const [editablePost, setEditablePost] = useState(null);
   const [selectedTagsId, setSelectedTagsId] = useState([]);
-  const [typingTime, setTypingTime] = useState(null);
   const { isLoading, isError, categories } = useSelector(categoryReducerState);
   const {
     isLoading: userIsLoading,
@@ -139,21 +139,26 @@ const PostSection = () => {
   };
 
   // Handle edit
-  const handleEdit = (post) => {
+  const { state } = useLocation();
+  const handleEdit = () => {
     setEditMode(true);
-    setEditablePost(post);
-    setSelectedTagsId(post.tags);
+    setEditablePost(state);
+    setSelectedTagsId(state.tags);
     setPostValue({
       ...postValue,
-      categoryId: post.category_id,
-      authorId: post.author_id,
-      postTitle: post.title,
-      postDescription: post.description,
-      likes: post.likes
+      categoryId: state.category_id,
+      authorId: state.author_id,
+      postTitle: state.title,
+      postDescription: state.description,
+      likes: state.likes
     });
 
-    dispatch(selectedAuthorsByCatId(post.category_id));
+    dispatch(selectedAuthorsByCatId(state.category_id));
   };
+
+  useEffect(() => {
+    handleEdit();
+  }, []);
 
   // Reset form
   const resetForm = () => {
@@ -169,6 +174,8 @@ const PostSection = () => {
 
   // handle selectd tag
   const handleSelectedTag = (tag) => {
+    console.log(tag);
+
     const isTagAlreadySelected = selectedTagsId?.includes(tag.id);
 
     if (!isTagAlreadySelected) {
@@ -177,6 +184,9 @@ const PostSection = () => {
     setPostValue({ ...postValue, inpuTagName: '' });
   };
 
+  console.log(selectedTagsId, 'selectedTagsId');
+
+  // Remove tag handler
   const handleRemoveTag = (tagId) => {
     const filterTag = selectedTagsId.filter((item) => item !== tagId);
     // console.log('filter Tag', filterTag);
@@ -230,26 +240,26 @@ const PostSection = () => {
       return;
     }
 
-    if (typingTime) {
-      clearTimeout(typingTime);
-    }
+    // if (typingTime) {
+    //   clearTimeout(typingTime);
+    // }
 
-    const timeOutId = setTimeout(() => {
-      if (!existingTag && tagName) {
-        createTagInLocal(tagName);
-      }
-    }, 5000);
+    // const timeOutId = setTimeout(() => {
+    //   if (!existingTag && tagName) {
+    //     createTagInLocal(tagName);
+    //   }
+    // }, 5000);
 
-    setTypingTime(timeOutId);
+    // setTypingTime(timeOutId);
   };
 
-  useEffect(() => {
-    return () => {
-      if (typingTime) {
-        clearTimeout(typingTime);
-      }
-    };
-  }, [typingTime]);
+  //   useEffect(() => {
+  //     return () => {
+  //       if (typingTime) {
+  //         clearTimeout(typingTime);
+  //       }
+  //     };
+  //   }, [typingTime]);
 
   const createTagInLocal = (tagName) => {
     const timeStamp = moment.utc().toISOString();
@@ -267,28 +277,26 @@ const PostSection = () => {
   return (
     <section className="py-16">
       <div className="xl:container mx-auto">
-        <div className="flex mb-4 flex-wrap">
-          <div className="w-1/3">
-            <PostForm
-              categories={categories}
-              isError={isError}
-              isLoading={isLoading}
-              userIsLoading={userIsLoading}
-              userIsError={userIsError}
-              users={authorByCategories}
-              onHandleSubmit={handleSubmit}
-              postValue={postValue}
-              onHandleChane={handleChange}
-              editMode={editMode}
-              tags={tags}
-              selectedTagsId={selectedTagsId}
-              onHandleSelectedTag={handleSelectedTag}
-              onHandleRemoveTag={handleRemoveTag}
-              onCancelUpdate={cancleUpdateHandler}
-              onHandleTagInputKeyDown={handleTagInputKeyDown}
-            />
-          </div>
-          <div className="w-2/3">
+        <div className=" mb-4 flex-wrap">
+          <PostForm
+            categories={categories}
+            isError={isError}
+            isLoading={isLoading}
+            userIsLoading={userIsLoading}
+            userIsError={userIsError}
+            users={authorByCategories}
+            onHandleSubmit={handleSubmit}
+            postValue={postValue}
+            onHandleChane={handleChange}
+            editMode={editMode}
+            tags={tags}
+            selectedTagsId={selectedTagsId}
+            onHandleSelectedTag={handleSelectedTag}
+            onHandleRemoveTag={handleRemoveTag}
+            onCancelUpdate={cancleUpdateHandler}
+            onHandleTagInputKeyDown={handleTagInputKeyDown}
+          />
+          {/* <div className="w-2/3">
             <ListTable
               isLoading={postIsLoading}
               isError={postIsError}
@@ -302,7 +310,7 @@ const PostSection = () => {
               onEditHandler={handleEdit}
               userList={users}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

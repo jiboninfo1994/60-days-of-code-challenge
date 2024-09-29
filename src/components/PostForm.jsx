@@ -2,6 +2,7 @@ import moment from 'moment';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { crateTag } from '../app/reducers/tags/tagsSlice';
+import { useLocation } from 'react-router-dom';
 
 const PostForm = ({
   isLoading,
