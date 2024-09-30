@@ -1,28 +1,104 @@
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+const Pagination = ({ totalPages, onSetCurrentPage, currentPage }) => {
+  const handlePagination = (pageNo, action) => {
+    switch (action) {
+      case 'current_page': {
+        console.log('hello');
 
-const Pagination = ({ dispatchURL, totalItems }) => {
-  const [postPerpage, setPostPerpage] = useState(8);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const dispatch = useDispatch();
+        onSetCurrentPage(pageNo);
+        return;
+      }
+      case 'next_page': {
+        if (currentPage < totalPages) {
+          onSetCurrentPage(currentPage + 1);
+        }
 
-  useEffect(() => {
-    dispatch(dispatchURL({ postPerpage, currentPage }));
-    setTotalPages(Math.ceil(totalItems / postPerpage));
-  }, [dispatch, dispatchURL, currentPage, postPerpage, totalItems]);
+        return;
+      }
+      case 'previous_page': {
+        if (currentPage > 1) {
+          onSetCurrentPage(currentPage - 1);
+        }
 
-  console.log(totalPages);
+        return;
+      }
+      case 'first_page': {
+        onSetCurrentPage(1);
+
+        return;
+      }
+      case 'last_page': {
+        onSetCurrentPage(totalPages);
+
+        return;
+      }
+    }
+  };
+
+  const getVisiblePages = () => {
+    const visiblePages = 5;
+    const pages = [];
+
+    let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + visiblePages - 1);
+
+    if (endPage - startPage < visiblePages - 1) {
+      startPage = Math.max(1, endPage - visiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  const visiblePageNumbers = getVisiblePages();
+  console.log(visiblePageNumbers);
 
   return (
     <div className="join">
-      {Array.from({ length: totalPages }, (_, index) => {
-        return (
-          <button key={index} className="join-item btn">
-            {index + 1}
-          </button>
-        );
-      })}
+      <button
+        disabled={currentPage === 1}
+        className="join-item btn"
+        onClick={() => handlePagination(null, 'first_page')}
+      >
+        First Page
+      </button>
+      <button
+        disabled={currentPage === 1}
+        className="join-item btn"
+        onClick={() => handlePagination(null, 'previous_page')}
+      >
+        Previous
+      </button>
+      {visiblePageNumbers &&
+        visiblePageNumbers?.map((page) => {
+          return (
+            <button
+              key={page}
+              className={`join-item btn ${
+                currentPage === page ? 'btn-active' : ''
+              }`}
+              onClick={() => handlePagination(page, 'current_page')}
+            >
+              {page}
+            </button>
+          );
+        })}
+      <button
+        disabled={currentPage === totalPages}
+        className="join-item btn"
+        onClick={() => handlePagination(null, 'next_page')}
+      >
+        Next
+      </button>
+      <button
+        disabled={currentPage === totalPages}
+        className="join-item btn"
+        onClick={() => handlePagination(null, 'last_page')}
+      >
+        Last Page
+      </button>
     </div>
   );
 };

@@ -1,38 +1,37 @@
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  categoryReducerState,
-  getCategories
-} from '../../app/reducers/category/categorySlice';
-import { useEffect, useState } from 'react';
-import { getTags, tagsReducerState } from '../../app/reducers/tags/tagsSlice';
-import {
-  getUsers,
-  userReducerState
-} from '../../app/reducers/users/usersSlice';
-import { getPosts } from '../../app/reducers/posts/postsSlice';
+import { useDispatch } from 'react-redux';
+import { useState } from 'react';
 
-const BlogFilter = () => {
+const BlogFilter = ({
+  categories,
+  tags,
+  users,
+  onGetPost,
+  onSetCurrentPage,
+  postPerpage,
+  currentPage
+}) => {
   const [filterValue, setFiltervalue] = useState({
     category: '',
     tag: '',
     author: '',
     search: ''
   });
-  const { categories } = useSelector(categoryReducerState);
-  const { tags } = useSelector(tagsReducerState);
-  const { users } = useSelector(userReducerState);
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getCategories());
-    dispatch(getUsers());
-    dispatch(getTags());
-  }, [dispatch]);
 
   // Handle submit
   const HandleSubmit = (e) => {
     e.preventDefault();
-    dispatch(getPosts(filterValue));
-    // setFiltervalue({ ...filterValue, category: '' });
+    dispatch(
+      onGetPost({
+        category: filterValue.category,
+        tag: filterValue.tag,
+        author: filterValue.author,
+        search: filterValue.search,
+        postPerpage,
+        currentPage
+      })
+    );
+    onSetCurrentPage(1);
   };
 
   // Handle change

@@ -11,29 +11,23 @@ export const getPosts = createAsyncThunk(
   'posts/getPosts',
   async (filterValue, thunkAPI) => {
     const { rejectWithValue, signal } = thunkAPI;
-    let url = Base_URL;
-
     console.log(filterValue);
+    let url;
 
     if (filterValue) {
       const { category, tag, author, search, postPerpage, currentPage } =
         filterValue;
-      //   console.log('tag', tag);
+      url = `${Base_URL}?_page=${currentPage}&_limit=${postPerpage}`;
 
       let queryParams = [];
 
       if (category) queryParams.push(`category_id=${category}`);
-      //   if (tag && tag.length > 0) queryParams.push(`tag_id=${[tag]}`);
       if (tag) queryParams.push(`tags=${[tag]}`);
       if (author) queryParams.push(`author_id=${author}`);
       if (search) queryParams.push(`title=${search}`);
 
       if (queryParams.length > 0) {
-        url += '?' + queryParams.join('&');
-      }
-
-      if (postPerpage && currentPage) {
-        url = `${url}?_page=${postPerpage}&_limit=${currentPage}`;
+        url += '&' + queryParams.join('&');
       }
     }
 

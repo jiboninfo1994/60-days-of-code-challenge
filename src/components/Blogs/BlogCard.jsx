@@ -2,19 +2,15 @@ import { Link } from 'react-router-dom';
 import { IoTime } from 'react-icons/io5';
 import { formatDate } from '../../app/common/common';
 import { SlLike } from 'react-icons/sl';
-import { useDispatch, useSelector } from 'react-redux';
-import { getTags, tagsReducerState } from '../../app/reducers/tags/tagsSlice';
-import { useEffect } from 'react';
-import {
-  categoryReducerState,
-  getCategories
-} from '../../app/reducers/category/categorySlice';
-import {
-  getUsers,
-  userReducerState
-} from '../../app/reducers/users/usersSlice';
-import { getPosts } from '../../app/reducers/posts/postsSlice';
-const BlogCard = ({ data, onHandleEdit }) => {
+import { useDispatch } from 'react-redux';
+const BlogCard = ({
+  data,
+  onHandleEdit,
+  categories,
+  tags: tagList,
+  users,
+  onGetPosts
+}) => {
   //   console.log(data);
   const {
     id,
@@ -26,16 +22,8 @@ const BlogCard = ({ data, onHandleEdit }) => {
     category_id,
     author_id
   } = data;
-  const { tags: tagList } = useSelector(tagsReducerState);
-  const { categories } = useSelector(categoryReducerState);
-  const { users } = useSelector(userReducerState);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getTags());
-    dispatch(getCategories());
-    dispatch(getUsers());
-  }, [dispatch]);
+  const dispatch = useDispatch();
 
   return (
     <div className="card bg-base-100 w-full shadow-xl border border-white">
@@ -64,7 +52,7 @@ const BlogCard = ({ data, onHandleEdit }) => {
 
               return (
                 <li
-                  onClick={() => dispatch(getPosts({ tag }))}
+                  onClick={() => dispatch(onGetPosts({ tag }))}
                   className="badge badge-accent cursor-pointer"
                   key={index}
                 >
@@ -85,11 +73,11 @@ const BlogCard = ({ data, onHandleEdit }) => {
                   <span>Category: </span>
                   <span
                     onClick={() =>
-                      dispatch(getPosts({ category: category_id }))
+                      dispatch(onGetPosts({ category: category_id }))
                     }
                     className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 cursor-pointer"
                   >
-                    {categoryItem.name}
+                    {categoryItem?.name}
                   </span>
                 </div>
               );
@@ -102,10 +90,10 @@ const BlogCard = ({ data, onHandleEdit }) => {
                 <div className="text-xs">
                   <span>Post By: </span>
                   <span
-                    onClick={() => dispatch(getPosts({ author: author_id }))}
+                    onClick={() => dispatch(onGetPosts({ author: author_id }))}
                     className="bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-pink-900 dark:text-pink-300 cursor-pointer"
                   >
-                    {author.name}
+                    {author?.name}
                   </span>
                 </div>
               );
