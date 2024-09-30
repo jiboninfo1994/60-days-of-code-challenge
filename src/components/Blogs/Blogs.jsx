@@ -18,9 +18,10 @@ import {
 } from '../../app/reducers/users/usersSlice';
 
 const Blogs = () => {
-  const [postPerpage, setPostPerpage] = useState(4);
+  const [postPerpage, setPostPerpage] = useState(8);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [selectedCatId, setSelectedCatId] = useState('');
   const { isLoading, isError, posts } = useSelector(postReducerState);
   const { categories } = useSelector(categoryReducerState);
   const { tags } = useSelector(tagsReducerState);
@@ -41,6 +42,11 @@ const Blogs = () => {
   }, [dispatch]);
 
   //   console.log(totalPages);
+  // Handle selected value
+  const handleSelectedValue = (id) => {
+    setSelectedCatId(id);
+    dispatch(getPosts({ category: id }));
+  };
 
   return (
     <section className="py-16">
@@ -55,6 +61,7 @@ const Blogs = () => {
           onSetCurrentPage={setCurrentPage}
           postPerpage={postPerpage}
           currentPage={currentPage}
+          selectedCatId={selectedCatId}
         />
         <div className="flex mb-4 flex-wrap">
           {!isLoading &&
@@ -73,6 +80,7 @@ const Blogs = () => {
                     tags={tags}
                     users={users}
                     onGetPosts={getPosts}
+                    onHandleSelectedValue={handleSelectedValue}
                   />
                 </div>
               );

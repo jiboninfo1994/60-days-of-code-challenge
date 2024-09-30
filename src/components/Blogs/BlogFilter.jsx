@@ -8,7 +8,8 @@ const BlogFilter = ({
   onGetPost,
   onSetCurrentPage,
   postPerpage,
-  currentPage
+  currentPage,
+  selectedCatId
 }) => {
   const [filterValue, setFiltervalue] = useState({
     category: '',
@@ -44,19 +45,27 @@ const BlogFilter = ({
     });
   };
 
+  //   console.log(selectedCatId, 'selectedCatId');
+
   return (
     <form onSubmit={HandleSubmit}>
       <div className="px-7 mb-12 flex gap-4">
         {categories && categories.length > 0 && (
           <select
             name="category"
-            value={filterValue.category}
+            // value={filterValue.category}
+            // value={filterValue.category ? filterValue.category : selectedCatId}
+            // defaultValue={selectedCatId}
             className="select select-bordered w-full max-w-xs"
             onChange={handleChange}
           >
             <option value="">Select Category</option>
             {categories.map((category) => (
-              <option value={category.id} key={category.id}>
+              <option
+                value={category.id}
+                key={category.id}
+                selected={category.id === selectedCatId}
+              >
                 {category.name}
               </option>
             ))}

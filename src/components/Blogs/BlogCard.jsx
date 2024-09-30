@@ -9,7 +9,8 @@ const BlogCard = ({
   categories,
   tags: tagList,
   users,
-  onGetPosts
+  onGetPosts,
+  onHandleSelectedValue
 }) => {
   //   console.log(data);
   const {
@@ -22,6 +23,7 @@ const BlogCard = ({
     category_id,
     author_id
   } = data;
+  const slug = title?.split(' ').join('-').toLowerCase();
 
   const dispatch = useDispatch();
 
@@ -73,7 +75,8 @@ const BlogCard = ({
                   <span>Category: </span>
                   <span
                     onClick={() =>
-                      dispatch(onGetPosts({ category: category_id }))
+                      //   dispatch(onGetPosts({ category: category_id }))
+                      onHandleSelectedValue(category_id)
                     }
                     className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 cursor-pointer"
                   >
