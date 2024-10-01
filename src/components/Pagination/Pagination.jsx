@@ -2,7 +2,7 @@ const Pagination = ({ totalPages, onSetCurrentPage, currentPage }) => {
   const handlePagination = (pageNo, action) => {
     switch (action) {
       case 'current_page': {
-        console.log('hello');
+        // console.log('hello');
 
         onSetCurrentPage(pageNo);
         return;
@@ -53,7 +53,7 @@ const Pagination = ({ totalPages, onSetCurrentPage, currentPage }) => {
   };
 
   const visiblePageNumbers = getVisiblePages();
-  console.log(visiblePageNumbers);
+  //   console.log(visiblePageNumbers);
 
   return (
     <div className="join">

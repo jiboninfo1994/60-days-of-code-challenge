@@ -1,8 +1,11 @@
-import moment from 'moment';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { crateTag } from '../app/reducers/tags/tagsSlice';
-import { useLocation } from 'react-router-dom';
+// import moment from 'moment';
+// import { useEffect } from 'react';
+// import { useDispatch } from 'react-redux';
+// import { crateTag } from '../app/reducers/tags/tagsSlice';
+// import { useLocation } from 'react-router-dom';
+
+// import { useSelector } from 'react-redux';
+// import { postReducerState } from '../app/reducers/posts/postsSlice';
 
 const PostForm = ({
   isLoading,
@@ -15,6 +18,7 @@ const PostForm = ({
   postValue,
   onHandleChane,
   editMode,
+  editablePost,
   tags,
   selectedTagsId,
   onHandleSelectedTag,
@@ -25,6 +29,8 @@ const PostForm = ({
   const filterTags = tags?.filter((item) =>
     item.name.toLowerCase().includes(postValue.inpuTagName?.toLowerCase())
   );
+
+  //   console.log(editablePost, 'editablePost');
 
   return (
     <form className="gap-5" onSubmit={onHandleSubmit}>
@@ -169,7 +175,7 @@ const PostForm = ({
         </div>
         <div className="flex gap-3">
           <button className="btn btn-primary" type="submit">
-            {editMode ? 'Update Post' : 'Add Post'}
+            {editablePost ? 'Update Post' : 'Add Post'}
           </button>
           {editMode && (
             <button
@@ -177,7 +183,7 @@ const PostForm = ({
               className="btn btn-primary"
               type="button"
             >
-              Cancel
+              editablePost
             </button>
           )}
         </div>

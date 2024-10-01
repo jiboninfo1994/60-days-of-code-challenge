@@ -12,10 +12,6 @@ import {
   getCategories
 } from '../../app/reducers/category/categorySlice';
 import { getTags, tagsReducerState } from '../../app/reducers/tags/tagsSlice';
-import {
-  getUsers,
-  userReducerState
-} from '../../app/reducers/users/usersSlice';
 
 const Blogs = () => {
   const [postPerpage, setPostPerpage] = useState(8);
@@ -25,7 +21,6 @@ const Blogs = () => {
   const { isLoading, isError, posts } = useSelector(postReducerState);
   const { categories } = useSelector(categoryReducerState);
   const { tags } = useSelector(tagsReducerState);
-  const { users } = useSelector(userReducerState);
   const dispatch = useDispatch();
 
   const total = 50;
@@ -37,7 +32,6 @@ const Blogs = () => {
 
   useEffect(() => {
     dispatch(getCategories());
-    dispatch(getUsers());
     dispatch(getTags());
   }, [dispatch]);
 
@@ -56,7 +50,6 @@ const Blogs = () => {
         <BlogFilter
           categories={categories}
           tags={tags}
-          users={users}
           onGetPost={getPosts}
           onSetCurrentPage={setCurrentPage}
           postPerpage={postPerpage}
@@ -78,7 +71,6 @@ const Blogs = () => {
                     data={post}
                     categories={categories}
                     tags={tags}
-                    users={users}
                     onGetPosts={getPosts}
                     onHandleSelectedValue={handleSelectedValue}
                   />

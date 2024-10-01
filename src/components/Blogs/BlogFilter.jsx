@@ -54,7 +54,7 @@ const BlogFilter = ({
           <select
             name="category"
             // value={filterValue.category}
-            // value={filterValue.category ? filterValue.category : selectedCatId}
+            value={filterValue.category ? filterValue.category : selectedCatId}
             // defaultValue={selectedCatId}
             className="select select-bordered w-full max-w-xs"
             onChange={handleChange}
@@ -64,7 +64,7 @@ const BlogFilter = ({
               <option
                 value={category.id}
                 key={category.id}
-                selected={category.id === selectedCatId}
+                // selected={category.id === selectedCatId}
               >
                 {category.name}
               </option>

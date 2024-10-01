@@ -31,6 +31,37 @@ export const getUsers = createAsyncThunk(
   }
 );
 
+// Get single user
+export const singleUser = createAsyncThunk(
+  'users/singleUser',
+  async (id, thunkAPI) => {
+    const { rejectWithValue, signal } = thunkAPI;
+
+    try {
+      const response = await fetch(`${URL}/${id}`, signal);
+      if (!response.ok) {
+        const error = {
+          response: {
+            data: {
+              statusCode: response.status,
+              message: await response.text()
+            }
+          }
+        };
+
+        throw error;
+      }
+
+      //   toast.success('Post is successfully fatched!');
+
+      return response.json();
+    } catch (error) {
+      handleApiError(error, 'User not found!');
+      rejectWithValue(error);
+    }
+  }
+);
+
 export const createUser = createAsyncThunk(
   'users/createUser',
   async (newUser) => {
@@ -210,6 +241,19 @@ export const usersSlice = createSlice({
         });
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = action.error?.message || 'Author fatched problem!';
+      })
+      .addCase(singleUser.pending, (state, action) => {
+        state.isLoading = true;
+        state.isError = null;
+      })
+      .addCase(singleUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = null;
+        state.users = action.payload;
+      })
+      .addCase(singleUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = action.error?.message || 'Author fatched problem!';
       });

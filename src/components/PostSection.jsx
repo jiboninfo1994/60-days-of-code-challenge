@@ -14,6 +14,7 @@ import {
 import {
   createPost,
   deletePost,
+  EDITABLE_POST,
   getPosts,
   postReducerState,
   updatePost
@@ -36,8 +37,8 @@ const PostSection = () => {
     inpuTagName: '',
     likes: 0
   });
-  const [editMode, setEditMode] = useState(false);
-  const [editablePost, setEditablePost] = useState(null);
+  //   const [editMode, setEditMode] = useState(false);
+  //   const [editablePost, setEditablePost] = useState(null);
   const [selectedTagsId, setSelectedTagsId] = useState([]);
   const { isLoading, isError, categories } = useSelector(categoryReducerState);
   const {
@@ -49,7 +50,8 @@ const PostSection = () => {
   const {
     isLoading: postIsLoading,
     isError: postIsError,
-    posts
+    posts,
+    editablePost
   } = useSelector(postReducerState);
   const {
     isLoading: tagIsLoading,
@@ -125,10 +127,10 @@ const PostSection = () => {
       updated_at: timeStamp
     };
 
-    if (editMode) {
+    if (editablePost) {
       dispatch(updatePost({ editablePost, postValue, selectedTagsId }));
-      setEditMode(false);
-      setEditablePost(null);
+      //   setEditMode(false);
+      dispatch(EDITABLE_POST(null));
       resetForm();
       setSelectedTagsId([]);
     } else {
@@ -139,26 +141,38 @@ const PostSection = () => {
   };
 
   // Handle edit
-  const { state } = useLocation();
-  const handleEdit = () => {
-    setEditMode(true);
-    setEditablePost(state);
-    setSelectedTagsId(state.tags);
-    setPostValue({
-      ...postValue,
-      categoryId: state.category_id,
-      authorId: state.author_id,
-      postTitle: state.title,
-      postDescription: state.description,
-      likes: state.likes
-    });
+  //   const { state } = useLocation();
+  //   const handleEdit = () => {
+  //     setEditMode(true);
+  //     setEditablePost(state);
+  //     setSelectedTagsId(state.tags);
+  //     setPostValue({
+  //       ...postValue,
+  //       categoryId: state.category_id,
+  //       authorId: state.author_id,
+  //       postTitle: state.title,
+  //       postDescription: state.description,
+  //       likes: state.likes
+  //     });
 
-    dispatch(selectedAuthorsByCatId(state.category_id));
-  };
+  //     dispatch(selectedAuthorsByCatId(state.category_id));
+  //   };
 
-  useEffect(() => {
-    handleEdit();
-  }, []);
+  //   useEffect(() => {
+  //     setEditMode(true);
+  //     setEditablePost(state);
+  //     setSelectedTagsId(state?.tags);
+  //     setPostValue({
+  //       ...postValue,
+  //       categoryId: state?.category_id,
+  //       authorId: state?.author_id,
+  //       postTitle: state?.title,
+  //       postDescription: state?.description,
+  //       likes: state?.likes
+  //     });
+
+  //     dispatch(selectedAuthorsByCatId(state?.category_id));
+  //   }, [state]);
 
   // Reset form
   const resetForm = () => {
@@ -184,7 +198,7 @@ const PostSection = () => {
     setPostValue({ ...postValue, inpuTagName: '' });
   };
 
-  console.log(selectedTagsId, 'selectedTagsId');
+  //   console.log(selectedTagsId, 'selectedTagsId');
 
   // Remove tag handler
   const handleRemoveTag = (tagId) => {
@@ -274,6 +288,23 @@ const PostSection = () => {
     setPostValue({ ...postValue, inpuTagName: '' });
   };
 
+  useEffect(() => {
+    if (editablePost) {
+      console.log(editablePost, 'editablePost');
+      setSelectedTagsId(editablePost.tags);
+
+      setPostValue({
+        ...postValue,
+        categoryId: editablePost.category_id,
+        authorId: editablePost.author_id,
+        postTitle: editablePost.title,
+        postDescription: editablePost.description,
+        likes: editablePost.likes
+      });
+      dispatch(selectedAuthorsByCatId(editablePost.category_id));
+    }
+  }, [editablePost]);
+
   return (
     <section className="py-16">
       <div className="xl:container mx-auto">
@@ -288,13 +319,14 @@ const PostSection = () => {
             onHandleSubmit={handleSubmit}
             postValue={postValue}
             onHandleChane={handleChange}
-            editMode={editMode}
+            // editMode={editMode}
             tags={tags}
             selectedTagsId={selectedTagsId}
             onHandleSelectedTag={handleSelectedTag}
             onHandleRemoveTag={handleRemoveTag}
             onCancelUpdate={cancleUpdateHandler}
             onHandleTagInputKeyDown={handleTagInputKeyDown}
+            editablePost={editablePost}
           />
           {/* <div className="w-2/3">
             <ListTable

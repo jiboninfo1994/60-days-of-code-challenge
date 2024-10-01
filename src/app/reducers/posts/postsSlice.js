@@ -11,7 +11,7 @@ export const getPosts = createAsyncThunk(
   'posts/getPosts',
   async (filterValue, thunkAPI) => {
     const { rejectWithValue, signal } = thunkAPI;
-    console.log(filterValue);
+    // console.log(filterValue);
     let url;
 
     if (filterValue) {
@@ -31,7 +31,7 @@ export const getPosts = createAsyncThunk(
       }
     }
 
-    console.log(url);
+    // console.log(url);
 
     try {
       const response = await fetch(url, signal);
@@ -153,8 +153,6 @@ export const updatePost = createAsyncThunk(
       updated_at: timeStamp
     };
 
-    console.log(selectedTagsId);
-
     try {
       const response = await fetch(
         `${Base_URL}/${id}`,
@@ -190,15 +188,52 @@ export const updatePost = createAsyncThunk(
   }
 );
 
+// Single post
+export const getSinglePost = createAsyncThunk(
+  'posts/getSinglePost',
+  async (id, thunkAPI) => {
+    const { rejectWithValue, signal } = thunkAPI;
+
+    try {
+      const response = await fetch(`${Base_URL}/${id}`, signal);
+
+      if (!response.ok) {
+        const error = {
+          response: {
+            data: {
+              statusCode: response.status,
+              message: await response.text()
+            }
+          }
+        };
+        throw error;
+      }
+
+      // toast.success('Post is succesfully updated!');
+
+      return response.json();
+    } catch (error) {
+      handleApiError(error, 'Post featching problem!');
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const initialState = {
   isLoading: false,
   isError: null,
-  posts: []
+  posts: [],
+  editablePost: null
 };
 
 export const postsSlice = createSlice({
   name: 'posts',
   initialState,
+  reducers: {
+    EDITABLE_POST: (state, action) => {
+      state.editablePost = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getPosts.pending, (state, action) => {
@@ -263,10 +298,24 @@ export const postsSlice = createSlice({
       .addCase(updatePost.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = action.error?.message || 'Post created problem!';
+      })
+      .addCase(getSinglePost.pending, (state, action) => {
+        state.isLoading = true;
+        state.isError = null;
+      })
+      .addCase(getSinglePost.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = null;
+        state.posts = action.payload;
+      })
+      .addCase(getSinglePost.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = action.error?.message || 'Post created problem!';
       });
   }
 });
 
 export const postReducerState = (state) => state.postReducer;
+export const { EDITABLE_POST } = postsSlice.actions;
 
 export default postsSlice.reducer;

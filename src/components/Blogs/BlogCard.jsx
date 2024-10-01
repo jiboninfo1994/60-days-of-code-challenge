@@ -1,14 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoTime } from 'react-icons/io5';
 import { formatDate } from '../../app/common/common';
 import { SlLike } from 'react-icons/sl';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { EDITABLE_POST } from '../../app/reducers/posts/postsSlice';
+import { useEffect } from 'react';
+import {
+  singleUser,
+  userReducerState
+} from '../../app/reducers/users/usersSlice';
 const BlogCard = ({
   data,
-  onHandleEdit,
   categories,
   tags: tagList,
-  users,
   onGetPosts,
   onHandleSelectedValue
 }) => {
@@ -23,9 +27,21 @@ const BlogCard = ({
     category_id,
     author_id
   } = data;
+  const { users } = useSelector(userReducerState);
   const slug = title?.split(' ').join('-').toLowerCase();
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleEdit = (post) => {
+    // console.log(post);
+    dispatch(EDITABLE_POST(post));
+    navigate('/about');
+  };
+
+  useEffect(() => {
+    dispatch(singleUser(author_id));
+  }, [dispatch, author_id]);
 
   return (
     <div className="card bg-base-100 w-full shadow-xl border border-white">
@@ -88,7 +104,7 @@ const BlogCard = ({
 
           {author_id &&
             (() => {
-              const author = users?.find((item) => item.id === author_id);
+              //   const author = users?.find((item) => item.id === author_id);
               return (
                 <div className="text-xs">
                   <span>Post By: </span>
@@ -96,7 +112,7 @@ const BlogCard = ({
                     onClick={() => dispatch(onGetPosts({ author: author_id }))}
                     className="bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-pink-900 dark:text-pink-300 cursor-pointer"
                   >
-                    {author?.name}
+                    {users?.name}
                   </span>
                 </div>
               );
@@ -106,11 +122,9 @@ const BlogCard = ({
         <div className="card-actions justify-between mt-6">
           <button
             className="btn btn-sm btn-active btn-ghost"
-            onClick={() => onHandleEdit(data)}
+            onClick={() => handleEdit(data)}
           >
-            <Link to={'/about'} state={data}>
-              Edit
-            </Link>
+            Edit
           </button>
           <button className="btn btn-sm btn-info">
             <Link to={id}>Read More</Link>
