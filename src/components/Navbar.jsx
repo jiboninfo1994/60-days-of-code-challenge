@@ -43,6 +43,9 @@ const Navbar = () => {
             <li>
               <Link to={'blog'}>Blog</Link>
             </li>
+            <li>
+              <Link to={'registration'}>Registration</Link>
+            </li>
           </ul>
         </div>
         <div className="navbar-end">
