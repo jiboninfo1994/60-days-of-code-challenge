@@ -34,6 +34,8 @@ const CategorySection = () => {
 
     if (editMode) {
       dispatch(updateCategory({ editableCat, catName }));
+      setEditMode(false);
+      setEditableCat(null);
     } else {
       dispatch(createCategory(catName));
       setCatName('');

@@ -202,8 +202,6 @@ export const usersSlice = createSlice({
         state.isError = null;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
-        console.log('action', action.payload);
-
         state.isLoading = false;
         state.isError = null;
         state.users = state.users.filter((item) => item.id !== action.payload);

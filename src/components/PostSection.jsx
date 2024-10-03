@@ -68,13 +68,6 @@ const PostSection = () => {
     dispatch(getTags());
   }, [dispatch]);
 
-  //
-  //   useEffect(() => {
-  //     if (postValue.inpuTagName) {
-  //       dispatch(selectedAuthorsByCatId(postValue.inpuTagName));
-  //     }
-  //   }, [dispatch, postValue.inpuTagName]);
-
   // Handle change
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -85,9 +78,9 @@ const PostSection = () => {
       }
     }
 
-    if (name === 'inpuTagName') {
-      dispatch(searchTagByTitle(value));
-    }
+    // if (name === 'inpuTagName') {
+    //   dispatch(searchTagByTitle(value));
+    // }
 
     if (name === 'categoryId') {
       dispatch(selectedAuthorsByCatId(value));
@@ -140,40 +133,6 @@ const PostSection = () => {
     }
   };
 
-  // Handle edit
-  //   const { state } = useLocation();
-  //   const handleEdit = () => {
-  //     setEditMode(true);
-  //     setEditablePost(state);
-  //     setSelectedTagsId(state.tags);
-  //     setPostValue({
-  //       ...postValue,
-  //       categoryId: state.category_id,
-  //       authorId: state.author_id,
-  //       postTitle: state.title,
-  //       postDescription: state.description,
-  //       likes: state.likes
-  //     });
-
-  //     dispatch(selectedAuthorsByCatId(state.category_id));
-  //   };
-
-  //   useEffect(() => {
-  //     setEditMode(true);
-  //     setEditablePost(state);
-  //     setSelectedTagsId(state?.tags);
-  //     setPostValue({
-  //       ...postValue,
-  //       categoryId: state?.category_id,
-  //       authorId: state?.author_id,
-  //       postTitle: state?.title,
-  //       postDescription: state?.description,
-  //       likes: state?.likes
-  //     });
-
-  //     dispatch(selectedAuthorsByCatId(state?.category_id));
-  //   }, [state]);
-
   // Reset form
   const resetForm = () => {
     setPostValue({
@@ -188,8 +147,6 @@ const PostSection = () => {
 
   // handle selectd tag
   const handleSelectedTag = (tag) => {
-    console.log(tag);
-
     const isTagAlreadySelected = selectedTagsId?.includes(tag.id);
 
     if (!isTagAlreadySelected) {
@@ -197,8 +154,6 @@ const PostSection = () => {
     }
     setPostValue({ ...postValue, inpuTagName: '' });
   };
-
-  //   console.log(selectedTagsId, 'selectedTagsId');
 
   // Remove tag handler
   const handleRemoveTag = (tagId) => {
@@ -211,8 +166,7 @@ const PostSection = () => {
   // Cansel update
   const cancleUpdateHandler = () => {
     resetForm();
-    setEditMode(false);
-    setEditablePost(null);
+    dispatch(EDITABLE_POST(null));
     setSelectedTagsId([]);
   };
 
@@ -239,41 +193,29 @@ const PostSection = () => {
   //         setPostValue({ ...postValue, inpuTagName: '' });
   //       }
   //     }
+
   const handleTagInputKeyDown = (e) => {
     const tagName = postValue.inpuTagName?.trim().toLowerCase();
-    const existingTag = tags
-      ?.map((item) => item.name.toLowerCase())
-      .includes(tagName);
+
+    // Find the existing tag object, not just check for its existence
+    const existingTag = tags?.find(
+      (item) => item.name.toLowerCase() === tagName
+    );
 
     if (e.key === 'Enter') {
       e.preventDefault();
 
       if (!existingTag && tagName) {
-        createTagInLocal(tagName);
+        const newTagId = createTagInLocal(tagName);
+        setSelectedTagsId((prevTags) => [...prevTags, newTagId]);
+      } else if (existingTag && !selectedTagsId.includes(existingTag.id)) {
+        setSelectedTagsId((prevTags) => [...prevTags, existingTag.id]);
       }
-      return;
+
+      // Reset the input field after processing
+      setPostValue({ ...postValue, inpuTagName: '' });
     }
-
-    // if (typingTime) {
-    //   clearTimeout(typingTime);
-    // }
-
-    // const timeOutId = setTimeout(() => {
-    //   if (!existingTag && tagName) {
-    //     createTagInLocal(tagName);
-    //   }
-    // }, 5000);
-
-    // setTypingTime(timeOutId);
   };
-
-  //   useEffect(() => {
-  //     return () => {
-  //       if (typingTime) {
-  //         clearTimeout(typingTime);
-  //       }
-  //     };
-  //   }, [typingTime]);
 
   const createTagInLocal = (tagName) => {
     const timeStamp = moment.utc().toISOString();
@@ -285,7 +227,8 @@ const PostSection = () => {
     };
 
     dispatch(crateTag(newTag));
-    setPostValue({ ...postValue, inpuTagName: '' });
+
+    return newTag.id;
   };
 
   useEffect(() => {
@@ -319,7 +262,6 @@ const PostSection = () => {
             onHandleSubmit={handleSubmit}
             postValue={postValue}
             onHandleChane={handleChange}
-            // editMode={editMode}
             tags={tags}
             selectedTagsId={selectedTagsId}
             onHandleSelectedTag={handleSelectedTag}
@@ -328,21 +270,6 @@ const PostSection = () => {
             onHandleTagInputKeyDown={handleTagInputKeyDown}
             editablePost={editablePost}
           />
-          {/* <div className="w-2/3">
-            <ListTable
-              isLoading={postIsLoading}
-              isError={postIsError}
-              lists={posts}
-              postDescription={'postDescription'}
-              likes={true}
-              created_at={true}
-              updatedAt={true}
-              onDeleteHandler={deletePost}
-              catList={categories}
-              onEditHandler={handleEdit}
-              userList={users}
-            />
-          </div> */}
         </div>
       </div>
     </section>

@@ -2,19 +2,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { IoTime } from 'react-icons/io5';
 import { formatDate } from '../../app/common/common';
 import { SlLike } from 'react-icons/sl';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { EDITABLE_POST } from '../../app/reducers/posts/postsSlice';
-import { useEffect } from 'react';
-import {
-  singleUser,
-  userReducerState
-} from '../../app/reducers/users/usersSlice';
 const BlogCard = ({
   data,
   categories,
   tags: tagList,
-  onGetPosts,
-  onHandleSelectedValue
+  onHandleSelectedValue,
+  users
 }) => {
   //   console.log(data);
   const {
@@ -27,8 +22,7 @@ const BlogCard = ({
     category_id,
     author_id
   } = data;
-  const { users } = useSelector(userReducerState);
-  const slug = title?.split(' ').join('-').toLowerCase();
+  //   const slug = title?.split(' ').join('-').toLowerCase();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -38,10 +32,6 @@ const BlogCard = ({
     dispatch(EDITABLE_POST(post));
     navigate('/about');
   };
-
-  useEffect(() => {
-    dispatch(singleUser(author_id));
-  }, [dispatch, author_id]);
 
   return (
     <div className="card bg-base-100 w-full shadow-xl border border-white">
@@ -70,7 +60,7 @@ const BlogCard = ({
 
               return (
                 <li
-                  onClick={() => dispatch(onGetPosts({ tag }))}
+                  onClick={() => onHandleSelectedValue(tag, 'by_tag_select')}
                   className="badge badge-accent cursor-pointer"
                   key={index}
                 >
@@ -92,7 +82,7 @@ const BlogCard = ({
                   <span
                     onClick={() =>
                       //   dispatch(onGetPosts({ category: category_id }))
-                      onHandleSelectedValue(category_id)
+                      onHandleSelectedValue(category_id, 'by_category_select')
                     }
                     className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 cursor-pointer"
                   >
@@ -104,15 +94,21 @@ const BlogCard = ({
 
           {author_id &&
             (() => {
-              //   const author = users?.find((item) => item.id === author_id);
+              let author;
+              // Ensure users is an array before using find
+              if (Array.isArray(users)) {
+                author = users.find((item) => item.id === author_id);
+              }
               return (
                 <div className="text-xs">
                   <span>Post By: </span>
                   <span
-                    onClick={() => dispatch(onGetPosts({ author: author_id }))}
+                    onClick={() =>
+                      onHandleSelectedValue(author_id, 'by_author_select')
+                    }
                     className="bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-pink-900 dark:text-pink-300 cursor-pointer"
                   >
-                    {users?.name}
+                    {author?.name}
                   </span>
                 </div>
               );

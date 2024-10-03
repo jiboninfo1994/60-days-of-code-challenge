@@ -11,7 +11,6 @@ export const getPosts = createAsyncThunk(
   'posts/getPosts',
   async (filterValue, thunkAPI) => {
     const { rejectWithValue, signal } = thunkAPI;
-    // console.log(filterValue);
     let url;
 
     if (filterValue) {

@@ -63,7 +63,7 @@ export const updateCategory = createAsyncThunk(
     const updateNote = { ...rest, name: catName };
 
     try {
-      const response = await fetch(`${URL}/${editableCat.id}`, {
+      const response = await fetch(`${URL}/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-type': 'application/json'

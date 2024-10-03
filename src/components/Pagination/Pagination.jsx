@@ -1,4 +1,9 @@
-const Pagination = ({ totalPages, onSetCurrentPage, currentPage }) => {
+const Pagination = ({
+  totalPages,
+  onSetCurrentPage,
+  currentPage,
+  filterValue
+}) => {
   const handlePagination = (pageNo, action) => {
     switch (action) {
       case 'current_page': {
