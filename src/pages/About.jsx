@@ -36,8 +36,8 @@ const About = () => {
     const newTag = {
       id: Date.now() + '',
       name: tagName,
-      created_at: timeStamp,
-      updated_at: timeStamp
+      createdAt: timeStamp,
+      updatedAt: timeStamp
     };
 
     if (editMode) {
@@ -82,7 +82,7 @@ const About = () => {
                 lists={tags}
                 isLoading={isLoading}
                 isError={isError}
-                created_at={true}
+                createdAt={true}
                 updatedAt={true}
                 onDeleteHandler={deleteTag}
                 onEditHandler={handleEdit}

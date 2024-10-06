@@ -17,12 +17,14 @@ const BlogCard = ({
     title,
     description,
     likes,
-    created_at,
+    createdAt,
     tags,
-    category_id,
-    author_id
+    categoryId,
+    authorId
   } = data;
   //   const slug = title?.split(' ').join('-').toLowerCase();
+  const categoryItem = categories?.find((item) => item.id === categoryId);
+  const author = users?.find((item) => item.id === authorId);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,78 +43,72 @@ const BlogCard = ({
         <div className="flex gap-2 items-center justify-between my-3">
           <div className="flex gap-1 items-center text-sm">
             <IoTime />
-            <span>{formatDate(created_at)}</span>
+            <span>{formatDate(createdAt)}</span>
           </div>
           <div className="flex gap-1 items-center text-sm">
             <SlLike />
             <span>{likes}</span>
           </div>
         </div>
-        {tags && tags.length > 0 && (
-          <ul className="flex flex-wrap gap-2">
-            <span>Tag: </span>
-            {tags?.map((tag, index) => {
-              //   console.log(tag);
+        {tags &&
+          tags?.length > 0 &&
+          // Filter tags to find valid tagItems
+          (() => {
+            const validTags = tags.filter((tag) =>
+              tagList?.some((item) => item.id === tag)
+            );
+            return validTags.length > 0 ? (
+              <ul className="flex flex-wrap gap-2 items-center">
+                <span>Tag: </span>
+                {validTags.map((tag, index) => {
+                  const tagItem = tagList.find((item) => item.id === tag);
 
-              //   console.log(tagList);
+                  return (
+                    <li
+                      onClick={() =>
+                        onHandleSelectedValue(tag, 'by_tag_select')
+                      }
+                      className="badge badge-accent cursor-pointer"
+                      key={index}
+                    >
+                      {tagItem?.name || 'Unknown Tag'}{' '}
+                      {/* Fallback to 'Unknown Tag' */}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null; // Return null if there are no valid tags
+          })()}
 
-              const tagItem = tagList?.find((item) => item.id === tag);
-
-              return (
-                <li
-                  onClick={() => onHandleSelectedValue(tag, 'by_tag_select')}
-                  className="badge badge-accent cursor-pointer"
-                  key={index}
-                >
-                  {tagItem?.name}
-                </li>
-              );
-            })}
-          </ul>
-        )}
         <div className="flex justify-between">
-          {category_id &&
-            (() => {
-              const categoryItem = categories.find(
-                (item) => item.id === category_id
-              );
-              return (
-                <div className="text-xs">
-                  <span>Category: </span>
-                  <span
-                    onClick={() =>
-                      //   dispatch(onGetPosts({ category: category_id }))
-                      onHandleSelectedValue(category_id, 'by_category_select')
-                    }
-                    className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 cursor-pointer"
-                  >
-                    {categoryItem?.name}
-                  </span>
-                </div>
-              );
-            })()}
+          {categoryId && (
+            <div className="text-xs">
+              <span>Category: </span>
+              <span
+                onClick={() =>
+                  //   dispatch(onGetPosts({ category: categoryId }))
+                  onHandleSelectedValue(categoryId, 'by_category_select')
+                }
+                className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 cursor-pointer"
+              >
+                {categoryItem?.name}
+              </span>
+            </div>
+          )}
 
-          {author_id &&
-            (() => {
-              let author;
-              // Ensure users is an array before using find
-              if (Array.isArray(users)) {
-                author = users.find((item) => item.id === author_id);
-              }
-              return (
-                <div className="text-xs">
-                  <span>Post By: </span>
-                  <span
-                    onClick={() =>
-                      onHandleSelectedValue(author_id, 'by_author_select')
-                    }
-                    className="bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-pink-900 dark:text-pink-300 cursor-pointer"
-                  >
-                    {author?.name}
-                  </span>
-                </div>
-              );
-            })()}
+          {author && (
+            <div className="text-xs">
+              <span>Post By: </span>
+              <span
+                onClick={() =>
+                  onHandleSelectedValue(authorId, 'by_author_select')
+                }
+                className="bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-pink-900 dark:text-pink-300 cursor-pointer"
+              >
+                {author?.name}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="card-actions justify-between mt-6">

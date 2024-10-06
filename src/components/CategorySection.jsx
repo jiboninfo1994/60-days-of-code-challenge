@@ -9,6 +9,7 @@ import {
   deleteCategory
 } from '../app/reducers/category/categorySlice';
 import ListTable from './ListTable';
+import { toast } from 'react-toastify';
 
 const CategorySection = () => {
   const [catName, setCatName] = useState('');
@@ -32,10 +33,19 @@ const CategorySection = () => {
       return alert('Category field is required!');
     }
 
+    if (
+      categories?.some(
+        (item) => item.name.toLowerCase() === catName.trim().toLowerCase()
+      )
+    ) {
+      return toast.warn('This category already exists!');
+    }
+
     if (editMode) {
       dispatch(updateCategory({ editableCat, catName }));
       setEditMode(false);
       setEditableCat(null);
+      setCatName('');
     } else {
       dispatch(createCategory(catName));
       setCatName('');

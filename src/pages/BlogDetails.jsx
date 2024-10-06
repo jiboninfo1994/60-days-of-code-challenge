@@ -23,30 +23,21 @@ const BlogDetails = () => {
   const { users } = useSelector(userReducerState);
   const { categories } = useSelector(categoryReducerState);
   const { tags: postTags } = useSelector(tagsReducerState);
-  const {
-    title,
-    description,
-    tags,
-    likes,
-    created_at,
-    category_id,
-    author_id
-  } = posts;
+  const { title, description, tags, likes, createdAt, categoryId, authorId } =
+    posts;
 
   useEffect(() => {
     dispatch(getSinglePost(id));
-    if (author_id) {
-      dispatch(singleUser(author_id));
+    if (authorId) {
+      dispatch(singleUser(authorId));
     }
     dispatch(getCategories());
     dispatch(getTags());
-  }, [dispatch, id, author_id]);
+  }, [dispatch, id, authorId]);
 
-  //   const author = users?.find((user) => user?.id === author_id);
-  const category = categories?.find((cat) => cat?.id === category_id);
+  // Filter user and tag
+  const category = categories?.find((cat) => cat?.id === categoryId);
   const filterTags = postTags?.filter((tag) => tags?.includes(tag.id));
-
-  //   console.log(users);
 
   return (
     <section className="py-10">
@@ -88,10 +79,10 @@ const BlogDetails = () => {
                 />
                 <div className="author-info">
                   {users && <h3 className="text-2xl mb-3">{users.name}</h3>}
-                  {created_at && (
+                  {createdAt && (
                     <span className="flex items-center gap-2">
                       <IoIosTime />
-                      {formatDate(created_at)}
+                      {formatDate(createdAt)}
                     </span>
                   )}
                 </div>

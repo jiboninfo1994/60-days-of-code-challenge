@@ -20,9 +20,9 @@ export const getPosts = createAsyncThunk(
 
       let queryParams = [];
 
-      if (category) queryParams.push(`category_id=${category}`);
+      if (category) queryParams.push(`categoryId=${category}`);
       if (tag) queryParams.push(`tags=${[tag]}`);
-      if (author) queryParams.push(`author_id=${author}`);
+      if (author) queryParams.push(`authorId=${author}`);
       if (search) queryParams.push(`title=${search}`);
 
       if (queryParams.length > 0) {
@@ -139,17 +139,17 @@ export const updatePost = createAsyncThunk(
   'posts/updatePost',
   async ({ editablePost, postValue, selectedTagsId }, thunkAPI) => {
     const { rejectWithValue, signal } = thunkAPI;
-    const { id, created_at, ...rest } = editablePost;
+    const { id, createdAt, ...rest } = editablePost;
     const timeStamp = moment.utc().toISOString();
     const updateNote = {
       ...rest,
       title: postValue.postTitle,
       description: postValue.postDescription,
-      author_id: postValue.authorId,
-      category_id: postValue.categoryId,
+      authorId: postValue.authorId,
+      categoryId: postValue.categoryId,
       likes: postValue.likes,
       tags: selectedTagsId,
-      updated_at: timeStamp
+      updatedAt: timeStamp
     };
 
     try {
@@ -258,7 +258,7 @@ export const postsSlice = createSlice({
         state.posts = [action.payload, ...state.posts];
         state.posts.sort((a, b) => {
           return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
         });
       })

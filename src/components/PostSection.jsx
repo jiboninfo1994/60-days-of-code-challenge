@@ -13,7 +13,6 @@ import {
 } from '../app/reducers/users/usersSlice';
 import {
   createPost,
-  deletePost,
   EDITABLE_POST,
   getPosts,
   postReducerState,
@@ -23,10 +22,8 @@ import ListTable from './ListTable';
 import {
   crateTag,
   getTags,
-  searchTagByTitle,
   tagsReducerState
 } from '../app/reducers/tags/tagsSlice';
-import { useLocation } from 'react-router-dom';
 
 const PostSection = () => {
   const [postValue, setPostValue] = useState({
@@ -78,10 +75,6 @@ const PostSection = () => {
       }
     }
 
-    // if (name === 'inpuTagName') {
-    //   dispatch(searchTagByTitle(value));
-    // }
-
     if (name === 'categoryId') {
       dispatch(selectedAuthorsByCatId(value));
     }
@@ -112,12 +105,12 @@ const PostSection = () => {
       id: Date.now() + '',
       title: postValue.postTitle,
       description: postValue.postDescription,
-      author_id: postValue.authorId,
-      category_id: postValue.categoryId,
+      authorId: postValue.authorId,
+      categoryId: postValue.categoryId,
       likes: postValue.likes,
       tags: selectedTagsId,
-      created_at: timeStamp,
-      updated_at: timeStamp
+      createdAt: timeStamp,
+      updatedAt: timeStamp
     };
 
     if (editablePost) {
@@ -185,8 +178,8 @@ const PostSection = () => {
   //         const newTag = {
   //           id: Date.now() + '',
   //           name: tagName,
-  //           created_at: timeStamp,
-  //           updated_at: timeStamp
+  //           createdAt: timeStamp,
+  //           updatedAt: timeStamp
   //         };
 
   //         dispatch(crateTag(newTag));
@@ -222,8 +215,8 @@ const PostSection = () => {
     const newTag = {
       id: Date.now() + '',
       name: tagName,
-      created_at: timeStamp,
-      updated_at: timeStamp
+      createdAt: timeStamp,
+      updatedAt: timeStamp
     };
 
     dispatch(crateTag(newTag));
@@ -238,13 +231,13 @@ const PostSection = () => {
 
       setPostValue({
         ...postValue,
-        categoryId: editablePost.category_id,
-        authorId: editablePost.author_id,
+        categoryId: editablePost.categoryId,
+        authorId: editablePost.authorId,
         postTitle: editablePost.title,
         postDescription: editablePost.description,
         likes: editablePost.likes
       });
-      dispatch(selectedAuthorsByCatId(editablePost.category_id));
+      dispatch(selectedAuthorsByCatId(editablePost.categoryId));
     }
   }, [editablePost]);
 

@@ -46,9 +46,8 @@ export const createCategory = createAsyncThunk(
 export const deleteCategory = createAsyncThunk(
   'category/deleteCategory',
   async (id) => {
-    console.log(id);
 
-    const response = await fetch(`${URL}/${id}`, {
+    const response = await fetch(`${URL}/${id}?_dependent=authors`, {
       method: 'DELETE'
     });
 

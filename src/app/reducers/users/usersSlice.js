@@ -93,7 +93,7 @@ export const updateUser = createAsyncThunk(
     const updatedUser = {
       ...rest,
       name: inputValue.userName,
-      category_id: inputValue.selectedCategory
+      categoryId: inputValue.selectedCategory
     };
 
     try {
@@ -138,7 +138,7 @@ export const selectedAuthorsByCatId = createAsyncThunk(
     const { rejectWithValue, signal } = thunkAPI;
 
     try {
-      const response = await fetch(`${URL}?category_id=${id}`, signal);
+      const response = await fetch(`${URL}?categoryId=${id}`, signal);
       if (!response.ok) {
         const error = {
           response: {

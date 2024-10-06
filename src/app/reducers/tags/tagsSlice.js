@@ -118,7 +118,7 @@ export const updateTag = createAsyncThunk(
     const { rejectWithValue, signal } = thunkAPI;
     const { tagName, editableTag } = data;
     const { id, ...rest } = editableTag;
-    const updateNote = { ...rest, name: tagName, updated_at: timeStamp };
+    const updateNote = { ...rest, name: tagName, updatedAt: timeStamp };
 
     // console.log(updateNote);
 

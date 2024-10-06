@@ -18,7 +18,7 @@ const CommentForm = ({ blogId }) => {
       id: Date.now() + '',
       title,
       blogId,
-      created_at: timeStamp
+      createdAt: timeStamp
     };
 
     dispatch(createComment(newComment));

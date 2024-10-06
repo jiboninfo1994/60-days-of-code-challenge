@@ -10,7 +10,7 @@ const ListTable = ({
   catList,
   postDescription,
   likes,
-  created_at,
+  createdAt,
   userList,
   updatedAt
 }) => {
@@ -31,7 +31,7 @@ const ListTable = ({
                 {userList && <th>User Name</th>}
                 {postDescription && <th>Description</th>}
                 {likes && <th>Total Likes</th>}
-                {created_at && <th>Create AT</th>}
+                {createdAt && <th>Created AT</th>}
                 {updatedAt && <th>Updated AT</th>}
 
                 <th>Actions</th>
@@ -42,12 +42,12 @@ const ListTable = ({
                 // console.log(list);
 
                 const category = catList?.find(
-                  (cat) => cat.id === list?.category_id
+                  (cat) => cat.id === list?.categoryId
                 );
-                const findUser = userList?.find(
-                  (item) => item.id === list.author_id
+                const author = userList?.find(
+                  (item) => item.id === list.authorId
                 );
-
+                // if (category || findUser) {
                 return (
                   <tr key={index}>
                     <th>{index + 1}</th>
@@ -56,19 +56,13 @@ const ListTable = ({
                     {category && (
                       <td>{category ? category.name : 'Unknown'}</td>
                     )}
-                    {findUser && (
-                      <td>{findUser ? findUser.name : 'Unknown'}</td>
-                    )}
+                    {author && <td>{author ? author.name : 'Unknown'}</td>}
 
                     {/* <td>{category.name}</td> */}
                     {list?.description && <td>{list?.description}</td>}
                     {list?.likes && <td>{list?.likes}</td>}
-                    {list?.created_at && (
-                      <td>{formatDate(list?.created_at)}</td>
-                    )}
-                    {list?.created_at && (
-                      <td>{formatDate(list?.updated_at)}</td>
-                    )}
+                    {list?.createdAt && <td>{formatDate(list?.createdAt)}</td>}
+                    {list?.createdAt && <td>{formatDate(list?.updatedAt)}</td>}
 
                     <td>
                       <div className="action flex gap-4">
@@ -88,6 +82,7 @@ const ListTable = ({
                     </td>
                   </tr>
                 );
+                // }
               })}
             </tbody>
           </table>

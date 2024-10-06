@@ -44,7 +44,7 @@ const UserSection = () => {
     const newUser = {
       id: Date.now() + '',
       name: inputValue.userName,
-      category_id: inputValue.selectedCategory
+      categoryId: inputValue.selectedCategory
     };
 
     if (editMode) {
@@ -67,7 +67,7 @@ const UserSection = () => {
     setInputValue({
       ...inputValue,
       userName: user.name,
-      selectedCategory: user.category_id
+      selectedCategory: user.categoryId
     });
   };
 
